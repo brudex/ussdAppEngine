@@ -1,0 +1,22 @@
+{
+  "test":{
+    "username": "sa",
+    "password": "Pass123@$$123",
+    "database": "UssdDb",
+    "host": "localhost",
+    "dialect": "mssql",
+    "nlaConfig":{
+      "payment" :{
+        "CollaboratorCode" :"0009",
+        "Token":"41f4141f844dbedb8645ffac6b7005c1",
+        "Key" : "3f8cfdc07cc3809b34bae863a266f836",
+        "ServerUrl":"http://test-onlineapi.tekstartafrika.com:40058/collect/"
+      },
+      "cncp" :{
+        "ServerUrl":"http://41.77.65.100:23001/cncp/",
+        "Key":"db5043d9b5277c6a7596913fecc3239b",
+        "Token":"1001"
+      } 
+    } 
+  }
+}
