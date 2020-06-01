@@ -164,22 +164,27 @@ function executePostActionLogic(menu, inRequest, session, callback) {
 function handleBackOptionSelected(inRequest, session, callback) {
     async.waterfall([
         function (done) {
-            session.popFromMenuStack();
-            done();
+            session.popFromMenuStack(done);
+
         },
         function (done) {
-            session.deleteLastInput();
-            let currentMenuId = session.getLastMenuId();
-            menuController.getMenuByUniqueId(currentMenuId, function (menu) {
-                done(null, menu);
-            })
+             session.getLastMenuId(function (currentMenuId) {
+                 console.log('Found Menu Id>>>');
+                 session.deleteLastInput();
+                 menuController.getMenuByUniqueId(currentMenuId, function (menu) {
+                     console.log('Menu returned in callback>>'+menu.uniqueId);
+                     done(null, menu);
+                 })
+            });
         },
         function (menu, done) {
+            console.log('calling executePreActionLogic >>>');
             executePreActionLogic(menu, inRequest, session, function (err, response) {
                 if (err) {
                     callback(err);
                     return done(true);
                 }
+                console.log('executePreActionLogic completed >>>'+JSON.stringify(response));
                 done(null, response);
             })
         },

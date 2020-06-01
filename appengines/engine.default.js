@@ -104,10 +104,11 @@ function handleRequest(inRequest, session, ussdApp, callback) {
         function (menu, done) {
             if (menu.goBackOptionSelected(inRequest)) {
                 console.log('Handling back option selected >>>');
-                logicController.handleBackOptionSelected(menu, inRequest, session, function (err, response) {
+                logicController.handleBackOptionSelected(inRequest,session ,function (err, response) {
                     if (err) {
                         return responseHandler.sendErrorResponse(err);
                     }
+                    console.log('Resonse from handleBackOptionSelected >>>'+JSON.stringify(response));
                     if (response) {
 
                         return responseHandler.sendCompletedResponse(response);

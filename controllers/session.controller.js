@@ -107,10 +107,11 @@ function UsssdUserSession(data,ussdApp){
             })
     };
     this.deleteLastInput = function () {
-        const sql = 'declare @id int\n' +
-            `select top 1 @id=id from UssdUserInput where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc\n` +
-            'delete from UssdUserInput where id=@id\n';
-        db.sequelize.query(sql);
+        const sql = 'declare @id int;\n' +
+            `select top 1 @id=id from UssdUserInputs where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc;\n` +
+            'delete from UssdUserInputs where id=@id\n';
+        console.log('Executing query >>>'+sql);
+        db.sequelize.query(sql,db.sequelize.QueryTypes.DELETE);
     };
     this.setMenuEnvVariable =function (vName,value) {  //actions return results which can saved and replaced in text before response
         console.log('actionFactory Setting menuEnv'+vName + ">>"+value);
@@ -135,6 +136,7 @@ function UsssdUserSession(data,ussdApp){
        const sql =  `select top 1 menuId from UssdSequenceStacks where appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc\n`;
        db.sequelize.query(sql,{type:db.Sequelize.QueryTypes.SELECT})
            .then(function (row) {
+               console.log('The last menu ID found is >>>'+JSON.stringify(row));
                 if(row.length){
                   return  callback(row[0].menuId);
                }
@@ -153,11 +155,18 @@ function UsssdUserSession(data,ussdApp){
         };
         db.UssdSequenceStack.create(data);
     };
-    this.popFromMenuStack = function () {
-        const sql = 'declare @id int\n' +
-            `select top 1 @id=id from UssdSequenceStacks where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc\n` +
-            'delete from UssdUserInput where id=@id\n';
-        db.sequelize.query(sql);
+    this.popFromMenuStack = function (callback) {
+        const sql = 'declare @id int;\n' +
+            `select top 1 @id=id from UssdSequenceStacks where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc;`+
+            'delete from UssdSequenceStacks where id=@id\n';
+        console.log('executing popFromMenuStack'+sql);
+        db.sequelize.query(sql).then(function () {
+            if(callback){
+                callback();
+            }
+        }).catch(function () {
+            callback();
+        });
      };
     this.getUssdApp = function (callback) {
         if(self.ussdApp){
@@ -182,7 +191,10 @@ function UsssdUserSession(data,ussdApp){
         return session;
     };
 
-    this.getAllUserInput();
+    if(self.sessionUuid){
+        this.getAllUserInput();
+    }
+
 
 }
 
