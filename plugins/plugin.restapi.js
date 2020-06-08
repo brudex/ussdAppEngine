@@ -20,6 +20,7 @@ function RestApiPlugin(){
     const utils = {};
     self.url ='';
     utils._ = _;
+    utils.logger= logger;
     self.payload = null;
     self.method = 'GET'; //POST,PUT,GET
     const requestheaders = {};

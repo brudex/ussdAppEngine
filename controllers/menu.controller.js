@@ -33,6 +33,7 @@ function getMenuByUniqueId(menuId,callback){
      db.UssdMenu.findOne({where:{uniqueId:menuId}})
         .then(function (menu) {
             if(menu){
+                console.log('Finally found menu');
                 let ussdMenu = new UssdMenuClass(menu);
                 return  callback(ussdMenu);
             }

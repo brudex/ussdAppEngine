@@ -28,6 +28,7 @@ drawResult.addListItem('','004 - 01 02 03 04 05');
 drawResult.addListItem('','003 - 01 02 03 04 05');
 drawResult.addListItem('','002 - 01 02 03 04 05');
 drawResult.addListItem('','001 - 01 02 03 04 05');
+drawResult.addListItem('0',' Back');
 
 const pick5ChooseNumbers = new MenuPage('{{session.inputs.itemPicked}}','pick5chooseNumber');
 pick5ChooseNumbers.addListItem('','Please Enter at {{env.enterLabel}}');

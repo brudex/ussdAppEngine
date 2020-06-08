@@ -55,7 +55,7 @@ function Menu(headerText,userDefinedName){
     self.terminate = false;
     self.save = function () {
         if(listItems.length){
-            self.displayText += '\n\r'+ listItems.join('\r\n');
+            self.displayText += '\n'+ listItems.join('\n');
         }
         const data = {
             appId : self.appId,
@@ -72,6 +72,7 @@ function Menu(headerText,userDefinedName){
             terminate : self.terminate,
             parentMenuId : self.parentMenuId
         };
+
         createMenu(data,function () {
             console.log(`Menu ---${self.displayText}--- saved `)
         })
