@@ -8,13 +8,13 @@
     "nlaConfig":{
       "payment" :{
         "CollaboratorCode" :"0009",
-        "Token":"41f4141f844dbedb8645ffac6b7005c1",
-        "Key" : "3f8cfdc07cc3809b34bae863a266f836",
-        "ServerUrl":"http://test-onlineapi.tekstartafrika.com:40058/collect/"
+        "Token":"fd469d1eff427772618d7668c932a476",
+        "Key" : "d6712dc9d65a30dd46201c3fd09b899e",
+        "ServerUrl":"http://onlineapi.tekstartafrika.com:30056/collect/"
       },
       "cncp" :{
-        "ServerUrl":"http://41.77.65.100:23001/cncp/",
-        "Key":"db5043d9b5277c6a7596913fecc3239b",
+        "ServerUrl":"http://onlineapi.tekstartafrika.com:30054/cncp/",
+        "Key":"a30398638269f29c67e600f73a054934",
         "Token":"1001"
       } 
     } 
