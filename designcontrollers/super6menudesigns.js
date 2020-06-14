@@ -16,7 +16,7 @@ mainMenu.isFirst=true;
 
 
 const pick5 = new MenuPage('{{session.inputs.itemPicked}}','pick5');
-pick5.addListItem('','Please select an option：');
+pick5.addListItem('','Please select an option');
 pick5.addListItem('1',' Random Number');
 pick5.addListItem('2',' Choose Your Number');
 pick5.addListItem('0',' Back');
@@ -49,7 +49,7 @@ confirmation.addListItem('1','Confirm');
 confirmation.addListItem('2','Cancel');
 confirmation.setParent(enterAmount.uniqueId);
 
-const finish = new MenuPage('Your bet has been successfully placed. Please check your fon to approve transaction','finish');
+const finish = new MenuPage('Your bet has been successfully placed. Please check your phone to approve transaction','finish');
 finish.terminate = true;
 
 /****************Switch Operations************/
