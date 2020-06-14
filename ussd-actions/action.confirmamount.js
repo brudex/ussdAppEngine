@@ -35,7 +35,7 @@ function handleRequest(params,callback){
                 machineOption: params.inputValues.machineOption,
                 confirmAmount : params.inputValues.confirmAmount,
                 lottoComp : params.inputValues.lottoComp
-             }
+             };
             let amounToPay = calculateTotalAmout(gameData);
             response.message = `NLA 5 90 Please Confirm Your Resultant Stake Amount is GHS${amounToPay} Enter :\r\n1. Confirm\n\r\n2. Cancel\n`;
             response.responseType = "input"; 
@@ -49,18 +49,18 @@ function handleRequest(params,callback){
 
 function calculateTotalAmout(gameData){
     let computResult = gameRequestProcessing.computeSubTypeBetType(gameData);
-    var stakeNos = computResult.stakeNos
+    const stakeNos = computResult.stakeNos;
     let stakeAmount = Number(computResult.stakeAmount);
     let betType = computResult.betType;
     let subType = computResult.subType;
     console.log(`the calculateTotalAmout  bettype ${betType} subtype ${subType}`);
     console.log(`the calculateTotalAmout stakeNos >>`+JSON.stringify(stakeNos));
     console.log(`the calculateTotalAmout stakeAmount >>`+stakeAmount);
-    var total_betCount = gameRequestProcessing.calculateBetCount(stakeNos, subType, betType, stakeAmount);
+    const total_betCount = gameRequestProcessing.calculateBetCount(stakeNos, subType, betType, stakeAmount);
     console.log(`the calculateTotalAmout totalBetcount >>`+JSON.stringify(total_betCount));
     const totalAmount = (Math.round(total_betCount[0]))/100; 
     return totalAmount.toFixed(2);    
- }
+}
  
 /*
 /* Do whatever u want in this file but make sure u export and implement the following methods

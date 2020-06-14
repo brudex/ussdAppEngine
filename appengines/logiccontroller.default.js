@@ -53,7 +53,6 @@ function executePreActionLogic(menu, inRequest, session, callback) {
                         }
                         return innerCb();
                     })
-
                 }, function (err) {
                     console.log('executePreActionLogic async.eachSeries completed>>'+err);
                     done(err)

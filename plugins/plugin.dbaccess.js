@@ -25,7 +25,7 @@ function DbAccessPlugin(){
 
 
     this.execute = function(callback){
-        if(_.isEmpty(self.tableName)){
+        if(_.isObject(self.query) && _.isEmpty(self.tableName)){
             return callback('Error: Table Name not specified')
         }
         if(_.isEmpty(self.query)) {
@@ -33,18 +33,49 @@ function DbAccessPlugin(){
         }
 
         if(_.isString(self.query)){
-          db.sequelize.query(self.query,db.sequelize.QueryTypes.SELECT).then(function (result) {
+
+            let qType =db.sequelize.QueryTypes.SELECT;
+            switch (this.queryType)  {
+                case "select":{
+                    qType =db.sequelize.QueryTypes.SELECT;
+                    break;
+                }
+                case "insert":{
+                    qType =db.sequelize.QueryTypes.INSERT;
+                    break;
+                }
+                case "update":{
+                    qType =db.sequelize.QueryTypes.UPDATE;
+                    break;
+                }
+            }
+
+          db.sequelize.query(self.query,qType).then(function (result) {
               self.actionResponse  = result;
               self.retMenu = null;
               return callback(null,self.actionResponse,self.retMenu);
           })
 
         }else if(_.isObject(self.query)){
-            db[self.tableName].query(self.query,db.sequelize.QueryTypes.SELECT).then(function (result) {
-                self.actionResponse  = result;
-                self.retMenu = null;
-                return callback(null,self.actionResponse,self.retMenu);
-            })
+            switch (this.queryType)  {
+                case "select":{
+                   return  db[self.tableName].findAll(self.query).then(function (result) {
+                        self.actionResponse  = result;
+                        self.retMenu = null;
+                        return callback(null,self.actionResponse,self.retMenu);
+                    })
+
+                }
+                case "insert":{
+                   return  db[self.tableName].create(self.query).then(function (result) {
+                        self.actionResponse  = result;
+                        self.retMenu = null;
+                        return callback(null,self.actionResponse,self.retMenu);
+                    });
+
+                }
+            }
+
         }
     }
 }

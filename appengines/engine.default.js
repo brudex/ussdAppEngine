@@ -12,7 +12,7 @@ function ResponseHandler (session,callback) {
     self.session = session;
     const callbackFunc = callback;
 
-    self.sendCompletedResponse = function(response){
+    self.sendCompletedResponse = function(response,menuId){
         let text ='';
         if(response.headerText){
             text+='\n' +response.headerText;
@@ -30,9 +30,15 @@ function ResponseHandler (session,callback) {
                 console.log('Text replacement model',model);
                 logger.info('Text replacement model',model);
                 const replacedText = Mustache.render(text,model);
+                if(menuId){
+                    self.session.pushToMenuStack(menuId,replacedText);
+                }
                 callback(createOutResponse(replacedText,response.terminate));
             })
         }else{
+            if(menuId){
+                self.session.pushToMenuStack(menuId,text);
+            }
             callbackFunc(createOutResponse(text,response.terminate));
         }
     };
@@ -80,10 +86,9 @@ function handleRequest(inRequest, session, ussdApp, callback) {
                                 responseHandler.sendErrorResponse(err);
                                 return done(true);
                             }
-
+                            console.log('Pre Action result >>>'+JSON.stringify(response));
                             if (response) {
-                                session.pushToMenuStack(menu.uniqueId);
-                                responseHandler.sendCompletedResponse(response);
+                                 responseHandler.sendCompletedResponse(response,menu.uniqueId);
                                 return done(true);
                             }
                         });
@@ -123,7 +128,7 @@ function handleRequest(inRequest, session, ussdApp, callback) {
             console.log('validationController.handleInputValidation >>>');
             validationController.handleInputValidation(menu, inRequest, session, function (errorMsg) {
                 if (errorMsg) {
-                    return responseHandler.sendCompletedResponse(errorMsg);
+                    return responseHandler.sendErrorResponse(errorMsg,false);
                 }
                 done(null, menu); //no validation errors
             });
@@ -140,8 +145,7 @@ function handleRequest(inRequest, session, ussdApp, callback) {
                    return done(null, nextMenu);
                 }
                 if (response) {
-                    session.pushToMenuStack(menu.uniqueId);
-                    return responseHandler.sendCompletedResponse(response); //if this is executed the session should end
+                     return responseHandler.sendCompletedResponse(response,menu.uniqueId); //if this is executed the session should end
                 }
                 return done(true);
             });
@@ -154,8 +158,7 @@ function handleRequest(inRequest, session, ussdApp, callback) {
                     return responseHandler.sendErrorResponse(err);
                 }
                 if (response) {
-                    session.pushToMenuStack(menuId);
-                    return responseHandler.sendCompletedResponse(response);
+                     return responseHandler.sendCompletedResponse(response,menuId);
                 }
                 done(null, response, menu);
             });
@@ -163,19 +166,6 @@ function handleRequest(inRequest, session, ussdApp, callback) {
 
     });
 }
-
-
-//
-//
-// function sendDisplayMenu(display, callback) {
-//     engineResponse.response.displayMenu = display.displayMenu;
-//     engineResponse.response.headerText = display.headerText;
-//     engineResponse.response.footerText = display.footerText;
-//     engineResponse.sessionData = requestData;
-//     engineResponse.error = false;
-//     engineResponse.responseType = display.responseType;
-//     callback(engineResponse);
-// }
 
 
 module.exports = {

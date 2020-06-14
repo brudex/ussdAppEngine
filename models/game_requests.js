@@ -17,7 +17,8 @@ module.exports = function(sequelize, DataTypes) {
     ProcessMessage : DataTypes.STRING,
     OrderNumber: DataTypes.STRING,
     TransId: DataTypes.STRING,
-  }, 
+    RetryCount: DataTypes.INTEGER,
+  },
   {
       instanceMethods: {
         getPaymentRequest : function(){

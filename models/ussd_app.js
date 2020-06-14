@@ -8,11 +8,7 @@ module.exports = function(sequelize, DataTypes) {
         appEngine: DataTypes.STRING,
         shortCode: DataTypes.STRING,
         provider: DataTypes.STRING,
-        // actionId: DataTypes.STRING,
-        // actionType: DataTypes.STRING,
-        ///terminate: DataTypes.BOOLEAN,
-        // headerText: DataTypes.STRING,
-        // footerText : DataTypes.STRING
+
     }, {
     });
     return UssdApp;

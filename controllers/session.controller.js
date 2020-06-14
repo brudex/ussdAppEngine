@@ -1,7 +1,6 @@
-const async = require('async');
 const _ = require('lodash');
+const utils = require('../utils');
 const db = require('../models');
-const logger = require("../logger");
 const dateFns = require('date-fns');
 const addMinutes = dateFns.addMinutes;
 const uuidv4 = require('uuid/v4');
@@ -40,16 +39,7 @@ function getNewOrCurrentSessionForApp(inRequest,ussdapp,callback){
 }
 
  function createSession(inRequest,ussdapp,callback){
-      // var session = {
-     //    sessionId : inRequest.sessionId,
-     //    appId : app.appId,
-     //    inputHolder : '0',
-     //    input : '0',
-     //    requestType : '0',
-     //    mobile : '0',
-     //    network : '0',
-
-     let userSession = new UsssdUserSession(inRequest,ussdapp);
+     let userSession = new UssdUserSession(inRequest,ussdapp);
      const data = userSession.toJson();
      data.shortCode = inRequest.input;
      db.UssdSession.create(data) ;
@@ -59,16 +49,15 @@ function getNewOrCurrentSessionForApp(inRequest,ussdapp,callback){
 function getCurrentSession(inRequest,callback){
    db.UssdSession.findOne({where :{sessionId:inRequest.sessionId,mobile:inRequest.mobile}})
        .then(function (sessionData) {
-           db.UssdApp.findOne({where:{appId:sessionData.appId}})
-               .then(function (ussdapp) {
-                   let userSession = new UsssdUserSession(sessionData,ussdapp);
-                   callback(userSession);
-               })
+           ussdAppController.getUssdAppByAppId(sessionData.appId,function (err,ussdapp) {
+               let userSession = new UssdUserSession(sessionData,ussdapp);
+               callback(userSession);
+           });
        });
 }
 
 
-function UsssdUserSession(data,ussdApp){
+function UssdUserSession(data,ussdApp){
     let self = this;
     self.sessionId= data.sessionId;
     self.appId = ussdApp.appId;
@@ -90,14 +79,37 @@ function UsssdUserSession(data,ussdApp){
             input : inRequest.input,
             inputHolder: menu.inputHolder
         };
-        console.log('Saving user input>>'+JSON.stringify(data));
-        db.UssdUserInput.create(data);
+        let input = inRequest.input.trim();
+        console.log('Input is  '+input);
+        if(utils.isNumeric(input)){
+            console.log('Input is numeric '+input);
+            if(_.isInteger(Number(input))){
+                 this.peekMenuStack(function (result) {
+                    let menuResponse=null;
+                    if(result){
+                        menuResponse = result.menuResponse;
+                        data.selectedOption= extractSelectedOptionText(menuResponse,inRequest.input);
+                    }
+                    console.log('Saving user peek result>>'+JSON.stringify(result));
+                    console.log('Saving user input>>'+JSON.stringify(data));
+                     db.UssdUserInput.create(data);
+                });
+            }else{
+                db.UssdUserInput.create(data);
+            }
+        }else{
+            db.UssdUserInput.create(data);
+        }
     };
+
     this.getAllUserInput = function (callback) {
         db.UssdUserInput.findAll({where:{appId:this.appId,sessionUuid:this.sessionUuid}})
             .then(function (inputs) {
-                let obj ={};
+                let obj = {};
                 inputs.forEach(function (item) {
+                    if(item.selectedOption){
+                        obj[item.inputHolder+'OptionText']=item.input;
+                    }
                     obj[item.inputHolder]=item.input;
                 });
                 self.inputs = Object.assign(self.inputs,obj);
@@ -106,6 +118,7 @@ function UsssdUserSession(data,ussdApp){
                 }
             })
     };
+
     this.deleteLastInput = function () {
         const sql = 'declare @id int;\n' +
             `select top 1 @id=id from UssdUserInputs where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc;\n` +
@@ -147,19 +160,31 @@ function UsssdUserSession(data,ussdApp){
     this.getUssdAppName = function () {
         return self.appName;
     };
-    this.pushToMenuStack = function (menuId) {
+
+    this.pushToMenuStack = function (menuId,response) {
         const data = {
             appId:self.appId,
             sessionUuid: self.sessionUuid,
+            menuResponse :response,
             menuId: menuId
         };
         db.UssdSequenceStack.create(data);
     };
-    this.popFromMenuStack = function (callback) {
+    this.peekMenuStack = function (callback) {
+        const sql =  `select top 1 menuId,menuResponse from UssdSequenceStacks where appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc\n`;
+        db.sequelize.query(sql,{type:db.Sequelize.QueryTypes.SELECT})
+            .then(function (row) {
+                 if(row.length){
+                    let data ={menuId:row[0].menuId,menuResponse:row[0].menuResponse};
+                    return  callback(data);
+                }
+                return callback();
+            });
+     };
+    this.popFromMenuStack  = function (callback) {
         const sql = 'declare @id int;\n' +
             `select top 1 @id=id from UssdSequenceStacks where  appId='${self.appId}' and sessionUuid='${self.sessionUuid}' order by id desc;`+
             'delete from UssdSequenceStacks where id=@id\n';
-        console.log('executing popFromMenuStack'+sql);
         db.sequelize.query(sql).then(function () {
             if(callback){
                 callback();
@@ -167,7 +192,7 @@ function UsssdUserSession(data,ussdApp){
         }).catch(function () {
             callback();
         });
-     };
+    };
     this.getUssdApp = function (callback) {
         if(self.ussdApp){
            return callback(self.ussdApp);
@@ -191,11 +216,21 @@ function UsssdUserSession(data,ussdApp){
         return session;
     };
 
+    function extractSelectedOptionText(response,input){
+        console.log("extractSelectedOptionText >>"+input);
+        let text =response;
+        let retVal = null;
+        const pattern = `(\n|$)(${input})\\s(.+)(\\n|\\r|$)`;
+        const reOptions = new RegExp(pattern);
+        const matchObj = reOptions.exec(text);
+        if(matchObj){
+            retVal = matchObj[3];
+        }
+        return retVal;
+    }
     if(self.sessionUuid){
         this.getAllUserInput();
     }
-
-
 }
 
 

@@ -12,9 +12,9 @@ const doPost = function (payload,config,callback) {
         if(error){
             console.log(error);
         }
-        console.log("Response headers are >>> ");
+        console.log("Response body is >>> ");
         console.log(body);
-        callback(error,body);
+        return callback(error,body);
     });
 };
 
@@ -29,7 +29,7 @@ const doGet = function (url,config,callback) {
     request(options, function(error, response, body){
         console.log(error);
         console.log(body);
-        callback(error,body);
+        return callback(error,body);
     });
 };
 

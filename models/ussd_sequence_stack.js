@@ -4,7 +4,7 @@
         appId: DataTypes.STRING,
         sessionUuid: DataTypes.STRING,
         menuId: DataTypes.STRING,
-
+        menuResponse: DataTypes.TEXT
     }, {
     });
     return UssdSequenceStack;

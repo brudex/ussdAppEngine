@@ -1,41 +1,18 @@
 const debug = require('debug')('ussdgateway:server');
 const http = require('http');
 const express = require('express');
-const path = require('path');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const routes = require('./routes/index');
-const apiRoutes = require('./routes/api');
 const app = express();
 const models = require("./models");
-const swaggerUi = require('swagger-ui-express');
-const cors = require('cors');
- // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-app.use(bodyParser.json());
+const nla_cron_jobs = require("./ussd-actions/cron.jobs");
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
-app.use('/', routes);
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// app.use('/api', apiRoutes);
 
-// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// error handlers
 
-// development error handler
-// will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
@@ -107,22 +84,28 @@ function onListening() {
     debug('Listening on ' + bind);
 }
 
+function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomPort(){
+    return ''+randomInteger(6500,6999)
+}
 
 /**
  * Get port from environment and store in Express.
  */
-var port = normalizePort(process.env.PORT || '1234');
+var port = normalizePort(process.env.PORT || randomPort());
 app.set('port', port);
 /**
- * Create HTTP server.
+ * Create Cron server.
 */
 var server = http.createServer(app);
 models.sequelize.sync().then(function() {
     server.on('error', onError);
-    server.on('listening', onListening);
+    server.on('CRON SERVER listening', onListening);
     server.listen(port);
-    require('./designcontrollers/super6design').initializeApp();
-    console.log("listening or port"+port);
+    console.log("Cron listening on port"+port);
 });
 
 

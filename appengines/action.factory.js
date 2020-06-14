@@ -1,6 +1,7 @@
 const async = require('async');
 const logger = require("../logger");
 const plugins = require('../plugins');
+const GetMemoryDbStore = require('../controllers/memorystore.controller').GetMemoryDbStore;
 
 
 function createActionFromPlugin(action,menu, inRequest, session, actionResults){
@@ -18,6 +19,7 @@ function createActionFromPlugin(action,menu, inRequest, session, actionResults){
           this.inRequest = inRequest;
           this.actionName = action.actionName;
           this.actionResults = actionResults;
+          this.memDb = GetMemoryDbStore(session.appId);
        }
     }
     //execute method will be in inherited parent
@@ -27,7 +29,6 @@ function createActionFromPlugin(action,menu, inRequest, session, actionResults){
     PluginAction.prototype.initialize = initFunc;
     return new PluginAction(menu, inRequest, session, actionResults,action)
 }
-
 
 
 

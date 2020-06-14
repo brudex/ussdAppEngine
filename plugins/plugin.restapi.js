@@ -1,10 +1,8 @@
-const async = require('async');
 const _ = require('lodash');
-const db = require('../models');
 const logger = require("../logger");
 const resthandler = require('../utils/resthandler');
-const menuController = require('../controllers/menu.controller');
-const validationController = require('../controllers/validation.controller');
+
+
 
 
 /**available methods include
@@ -25,37 +23,40 @@ function RestApiPlugin(){
     self.method = 'GET'; //POST,PUT,GET
     const requestheaders = {};
 
-    const addHeader = function (key,value) {
+    self.addHeader = function (key,value) {
         requestheaders[key]=value;
     };
 
-    const addBasicAuthentication = function (userName,password) {
+    self.addBasicAuthentication = function (userName,password) {
         let buff = new Buffer(`${userName}:${password}`);
         let base64data = buff.toString('base64');
         requestheaders['Authorization']= 'Basic '+base64data;
     };
 
-    const addJsonHeaders = function () {
+    self.addJsonHeaders = function () {
         requestheaders['Content-Type'] ='application/json';
     };
 
     this.execute = function(callback){
+        console.log('Called execute restapi');
          if(_.isEmpty(self.method)){
              return callback('Invalid request method');
          }
         if(self.method.toUpperCase()==='GET'){
             let config= {headers:requestheaders};
             resthandler.doGet(self.url,config,function (error, responseBody) {
-                console.log('actionFactory Menu after execute >>>'+this.actionName +">>"+JSON.stringify(responseBody));
+                console.log('actionFactory after execute >>>'+this.actionName +">>"+JSON.stringify(responseBody));
                 self.err = error;
                 self.actionResponse = responseBody;
                 self.retMenu = null;
                 callback(self.err, self.actionResponse, self.retMenu)
             })
         }else if(self.method.toUpperCase()==='POST'){
+            console.log('Called post in restapi');
             let config= {headers:requestheaders,url:self.url};
+            console.log('The config >>>'+JSON.stringify(config));
             resthandler.doPost(self.payload,config,function (error, responseBody) {
-                console.log('actionFactory Menu after execute >>>'+this.actionName +">>"+JSON.stringify(responseBody));
+                console.log('actionFactory after execute >>>'+this.actionName +">>"+JSON.stringify(responseBody));
                 self.err = error;
                 self.actionResponse = responseBody;
                 self.retMenu = null;

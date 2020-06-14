@@ -5,6 +5,7 @@ const logger = require("../logger");
 const appController = require('./app.controller');
 const menudesignController = require('./menudesign.controller');
 const actiondesignController = require('./actiondesign.controller');
+const taskFlowDesignController = require('./taskflowdesign.controller');
 
 
 function createSuper6App(callback){
@@ -42,6 +43,9 @@ function initializeApp(){
         })
     },
     function (done) {
+        taskFlowDesignController.deleteAllFlows(done);
+    },
+    function (done) {
         menudesignController.deleteAllMenus(done);
     },
     function (done) {
@@ -52,8 +56,15 @@ function initializeApp(){
     },
     function (done) {
        require('./super6menudesigns');
+       require('./super6taskflowdesigns');
         done();
-    }
+    },
+        function (done) {
+           setTimeout(function () {
+               require('../controllers/crontasks.controller');
+           },5*1000);
+             done();
+        }
 
     ]);
 }

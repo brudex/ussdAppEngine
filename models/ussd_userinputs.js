@@ -6,7 +6,8 @@ module.exports = function(sequelize, DataTypes) {
         sessionUuid : DataTypes.STRING,
         sequence:DataTypes.INTEGER,
         inputHolder : DataTypes.STRING,
-        input:DataTypes.STRING
+        input:DataTypes.STRING,
+        selectedOption:DataTypes.STRING
      },{
 
     });

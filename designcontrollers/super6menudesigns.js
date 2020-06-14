@@ -3,7 +3,7 @@ const UssdAction = require('./actiondesign.controller').UssdAction;
 const Operators = require('../controllers/operator.contants');
 
 /**************Menu Definitions*********/
-const mainMenu = new MenuPage('Super 6, Good lucky','mainMenu');
+const mainMenu = new MenuPage('Super 6 Event No. {{session.inputs.drawNo}}','mainMenu');
 mainMenu.addListItem('',' Please select and option :');
 mainMenu.addListItem('1',' PICK 6');
 mainMenu.addListItem('2',' PICK 5');
@@ -66,15 +66,9 @@ confirmation.save();
 finish.save();
 
 
-// constructor(menu,session,inRequest,actionResults) {
-//     super();
-//     this.menu = menu;
-//     this.session = session;
-//     this.inRequest = inRequest;
-//     this.actionResults = actionResults;
-// }
 
 
+/****************Actions Defintions************/
 const mainMenuAction = new UssdAction('mainMenuAction',mainMenu.uniqueId,'javascript','post');
 mainMenuAction.actionCode = function () {
     console.log('actionFactory mainMenuAction');
@@ -98,6 +92,17 @@ mainMenuAction.actionCode = function () {
         }
          this.session.setSessionValue('itemPicked','PICK '+pickNumber);
     }
+};
+
+const mainMenuPreAction = new UssdAction('mainMenuPreAction',mainMenu.uniqueId,'javascript','pre');
+mainMenuPreAction.actionCode = function () {
+    console.log('actionFactory mainMenuPreAction');
+    let drawEvent = this.memDb.getObject('drawEvent');
+    if(drawEvent){
+        let drawNo = drawEvent.drawNo;
+        this.session.setSessionValue('drawNo',drawNo);
+    }
+
 };
 
 const pick5Action = new UssdAction('pick5Action',pick5.uniqueId,'javascript','post');
@@ -172,8 +177,25 @@ pick5ChooseNumbersAction.actionCode = function () {
 };
 
 
+const finishPostGameAction =  new UssdAction('finishAction',finish.uniqueId,'dbaccess','pre');
+finishPostGameAction.actionCode = function (){
+    let inputs =this.session.inputs;
+    inputs.mobile = this.session.mobile;
+    inputs.network = this.session.network;
+   let userInputs = JSON.stringify(inputs);
+   this.query = {
+       Mobile:this.session.mobile,
+       GameData :userInputs,
+       Network : this.session.network,
+       ProcessStatus:'Queued'
+   };
+   this.tableName = "GameRequest";
+   this.queryType = 'insert';
+};
 
 
 mainMenuAction.save();
+mainMenuPreAction.save();
 pick5Action.save();
 pick5ChooseNumbersAction.save();
+finishPostGameAction.save();

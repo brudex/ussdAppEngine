@@ -29,7 +29,7 @@ const menuController = require('../controllers/menu.controller');
     }
 
     this.execute = function(callback){
-        console.log('actionFactory Menu after execute >>>'+this.actionName +">>"+JSON.stringify(this.menu));
+        console.log('actionFactory result after execute >>>'+this.actionName +">>"+JSON.stringify(this.menu));
         callback(self.err, self.actionResponse, self.retMenu)
     }
 }

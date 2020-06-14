@@ -1,8 +1,5 @@
 var async = require('async');
-const actionName = "postGameRequest";
-var utils = require("../utils");
-const _restHandler  = require("../utils/resthandler")
-var logger = require("../logger"); 
+var utils = require("../utils");var logger = require("../logger");
 var db = require("../models");
 var env = process.env.NODE_ENV || "test";
 const appConfig =  require('../config/config.json')[env];
@@ -14,88 +11,78 @@ const gameConfiguration = require('./game.configurations');
 var __OrderNumberIncrement = 0;
 const gameMarks = gameConfiguration.gameMarks;
 const ProcessStatus = gameConfiguration.ProcessStatus;
-const GameOptions = gameConfiguration.GameOptions;
 
 
-function processGameRequest(gameData, callback) {
+function processGameRequest(gameRequest, callback) {
+    let gameData = JSON.parse(gameRequest.GameData);
     const _Mobile = gameData.mobile;
     const _Network = gameData.network;
-    var payload = {};
     const _Reference = utils.getRandomReference();
     const _OrderNumber = generateOrderNumber();
-    var _GameMark ='';
-    let drawEvent = gameConfiguration.getDrawEventByGameOption(gameData.gameOption)
+    let _GameMark ='';
+    let drawEvent = gameConfiguration.getDrawEventByGameOption();
     _GameMark = drawEvent.gameMark;
-    if(gameData.gameOption === GameOptions.NLA590) { //NLA 590 
-        payload = buildNla590Payload(gameData,_GameMark, _Reference, _OrderNumber); 
-    }
-    else if (gameData.gameOption === GameOptions.VAGLOTTO) { //Vag lotto
-        payload = buildVagLottoPayload(gameData,_GameMark, _Reference, _OrderNumber);
-    }
+    const payload = buildSuper6Payload(gameData,_GameMark, _Reference, _OrderNumber);
+    console.log('Super 6 payload>>'+JSON.stringify(payload));
+
     async.waterfall([ 
         function(done){
             const betAmount = (Math.round(payload.amount))/100;
-            const data1 = { GameCode: _GameMark,GameData : JSON.stringify(gameData),Mobile:gameData.mobile,Amount:betAmount, GameRequest: JSON.stringify(payload), TransId: _Reference,OrderNumber:_OrderNumber };
-            db.GameRequest.create(data1).then(function (gameReq) {
-                done(null, gameReq);
-            });
+            gameRequest.GameCode =_GameMark;
+            gameRequest.GameRequest = JSON.stringify(payload);
+            gameRequest.TransId =_Reference;
+            gameRequest.Amount = betAmount;
+            gameRequest.OrderNumber =_OrderNumber;
+            gameRequest.save();
+            done(null,gameRequest)
         },
         function (gameReq, topdone) {
-            let paymentGameCode = "";
-            if(_GameMark == gameMarks.vagLotto) {
-                paymentGameCode = paymentProcessing.PaymentGameCode_VAG90;
-            }
-            else {
-                paymentGameCode = paymentProcessing.PaymentGameCode_NLA590;
-            }
-            async.parallel([
-                function(done){
+            let paymentGameCode =  gameMarks.super6;
                     setTimeout(function(){
                         paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
                             if (err) {
-                                return callback("Error processing payment");
+                                return topdone("Error processing payment");
                             }
                             gameReq.PaymentRequest = JSON.stringify(req);
                             gameReq.PaymentResponse = JSON.stringify(resp);
                             if (resp && (resp.responseCode === 1 || resp.responseCode === 0 )) {
-                                if (resp.transStatus == 0 ) {
+                                if (resp.transStatus === 0 ) {
                                     gameReq.PaymentStatus = resp.transStatus;
-                                    gameReq.ProcessStatus = ProcessStatus.PaymentSuccess;
+                                    gameReq.ProcessStatus = ProcessStatus.PendingPayment;
                                     gameReq.save();
                                 }
-                                else if(resp.transStatus == 1) {
+                                else if(resp.transStatus === 1) {
                                     gameReq.PaymentStatus = resp.transStatus;
                                     gameReq.ProcessStatus = ProcessStatus.Failed;
                                     gameReq.save(); 
                                 }
-                                else if(resp.transStatus == 2) {
+                                else if(resp.transStatus === 2) {
                                     gameReq.PaymentStatus = resp.transStatus;
                                     gameReq.ProcessStatus = ProcessStatus.PendingPayment;
                                     gameReq.save(); 
                                 }
                             }
                             else {
+                                gameReq.PaymentStatus = resp.transStatus;
                                 gameReq.ProcessStatus = ProcessStatus.Failed;
                                 gameReq.save(); 
                             }
-                            done();
+                            return topdone();
                         }); 
-                    },1000*10); 
-                    
-                } 
-            ]); 
-            callback(null,"You request is being processed. Check your phone to approve MOMO debit",_Reference);
-            return topdone();
-        } ]);
+                    },1000*10);
+
+
+        } ],function (err) {
+        callback(err,_Reference);
+    });
 }
 
-function buildVagLottoPayload(gameData,_GameMark,_Reference, _OrderNumber) {
-    logger.info('Makeing supposed to be Vag Lotto  gameOption is>>> ' + gameData.gameOption);
+function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
     const _Mobile = gameData.mobile;
     const _Network = gameData.network;
-    var betType ='';
-    var subType = '';
-    var directOption = parseInt(gameData.directOption);
+    let betType ='';
+    let subType = '';
+    var directOption = parseInt(gameData.mainMenu);
     switch (directOption) {
         case 1:
             subType = "Q1";
@@ -138,25 +125,25 @@ function buildVagLottoPayload(gameData,_GameMark,_Reference, _OrderNumber) {
             betType = "DT";
             break;
     }
-    var stakeNos = gameData.numberToPlay.split(' ');
-    var codeStr = stakeNos.join('+');
-    const stakeAmount = Number(gameData.betAmount);
-    var total_betCount = calculateBetCount(stakeNos, subType, betType, stakeAmount);
+    const stakeNos = gameData.pick5chooseNumber.split(' ');
+    const codeStr = stakeNos.join('+');
+    const stakeAmount = Number(gameData.amount);
+    const total_betCount = calculateBetCount(stakeNos, subType, betType, stakeAmount);
     const totalAmount = Math.round(total_betCount[0]);
     const betNumber = total_betCount[1];
     const betTimes = total_betCount[2];
-    payload = {
+    const payload = {
         "messengerId": _Reference,
         "token": "1001",
         "timestamp": utils.timeStamp(),
         "transType": "31004",
         "orderNo": _OrderNumber,
         "gameMark": _GameMark,
-        "drawNo": gameConfiguration.DrawEventInfo.vagLotto.drawNo,
+        "drawNo":gameConfiguration.getDrawEventByGameOption().drawNo,//todo gameConfiguration.DrawEventInfo.super6.drawNo,
         "amount": totalAmount,
         "client": _Mobile,
         "channel": 4,
-        "extend": gameData.lottoComp,
+        "extend": 1,
         "betlines": [
             {
                 "betNumber": betNumber,
@@ -169,48 +156,7 @@ function buildVagLottoPayload(gameData,_GameMark,_Reference, _OrderNumber) {
             }
         ]
     };
-    logger.info("Payload for Vag lotto request >>", payload);
-    return payload;
-}
-
-function buildNla590Payload(gameData,_GameMark,_Reference, _OrderNumber) {
-    const _Mobile = gameData.mobile;
-    const _Network = gameData.network;
-    let computResult = computeSubTypeBetType(gameData);
-    var stakeNos = computResult.stakeNos;
-    var codeStr = computResult.codeStr;
-    let stakeAmount = computResult.stakeAmount;
-    var betType = computResult.betType;
-    var subType = computResult.subType;
-    var total_betCount = calculateBetCount(stakeNos, subType, betType, stakeAmount);
-    const totalAmount = Math.round(total_betCount[0]);
-    const betNumber = total_betCount[1];
-    const betTimes = total_betCount[2];
-    var payload = {
-        "messengerId": _Reference,
-        "token": "1001",
-        "timestamp": utils.timeStamp(),
-        "transType": "31004",
-        "orderNo": _OrderNumber,
-        "gameMark": _GameMark,
-        "drawNo": gameConfiguration.DrawEventInfo.nla590.drawNo,
-        "amount": totalAmount,
-        "client": _Mobile,
-        "channel": 4,
-        "extend": gameData.lottoComp,
-        "betlines": [
-            {
-                "betNumber": betNumber,
-                "subType": subType,
-                "betType": betType,
-                "codeStr": codeStr,
-                "lineAmount": totalAmount,
-                "betTimes": betTimes,
-                "flag": 1
-            }
-        ]
-    };
-    logger.info("Payload for Vag lotto request >>", payload);
+    logger.info("Payload for Super 6 request >>", payload);
     return payload;
 }
 
@@ -274,21 +220,7 @@ function computeSubTypeBetType(gameData) {
     return { stakeNos, codeStr, stakeAmount, subType, betType, codeStr };
 }
 
- function getErrorResponse(msg){
-    const resp={};
-    resp.message = msg;
-    resp.error = true;
-    resp.responseType = "end";
-    return resp;
- }
 
- function getCompletedResponse(msg){
-    const resp={};
-    resp.message = msg;
-    resp.error = false;
-    resp.responseType = "end";
-    return resp;
- }
 
  function generateOrderNumber(){
      __OrderNumberIncrement+=1;
@@ -313,7 +245,7 @@ function computeSubTypeBetType(gameData) {
     let config = {
         url : ServiceUrl,
         headers : { Signature : sig } 
-    }
+    };
     return config;
  }
  
@@ -419,19 +351,16 @@ function computeSubTypeBetType(gameData) {
  }
 
  function resetOrderNumberCounter(){
-    let sql ="select max(id) 'maxId' from dbo.[GameRequests]"
+    let sql ="select max(id) 'maxId' from dbo.[GameRequests]";
     db.sequelize.query(sql,{type: db.sequelize.QueryTypes.SELECT})
     .then(function(items){
          if(items.length){
-            console.log('Teh max id is >>'+items[0].maxId)
+            console.log('Teh max id is >>'+items[0].maxId);
             __OrderNumberIncrement = items[0].maxId;
         } 
     })
 }
- 
-function setDayOfTheWeek(dayOWeek){
-  __DayOfTheWeek=dayOWeek;
-}
+
 
  
 module.exports = {
@@ -442,6 +371,5 @@ module.exports = {
     resetOrderNumberCounter,
     computeSubTypeBetType,
     calculateBetCount,
-    setDayOfTheWeek,
-    generateOrderNumber 
+    generateOrderNumber
 };

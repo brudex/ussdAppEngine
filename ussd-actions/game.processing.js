@@ -9,27 +9,32 @@ const paymentProcessing = require('./payment.processing');
 const smsHandler = require('./sms.api.handler');
 const ProcessStatus = gameConfiguration.ProcessStatus;
  
+
 function processingPendingPayments(){
-    db.GameRequest.findAll({where:{
-        ProcessStatus:gameRequestProcessing.ProcessStatus.PendingPayment
-    }})
-    .then(function(rows){
-        if(rows.length){
-            for(var k=0,len=rows.length;k<len;k++){
-                processPendingGameRequest(rows[k]);
-            } 
-        }
-    })
+    setTimeout(function(){
+        db.GameRequest.findAll({where:{
+                ProcessStatus:gameRequestProcessing.ProcessStatus.PendingPayment
+            },limit:1000 })
+            .then(function(rows){
+                async.forEach(rows,function(row,done){
+                    processPendingGameRequest(row,function(){
+                        done();
+                    });
+                },function(err){
+                    processingPendingPayments();
+                })
+            })
+    },60*1000);
 }
 
 
-function processPendingGameRequest(gameRequest){
+function processPendingGameRequest(gameRequest,completedCallback){
     const payload = JSON.parse(gameRequest.GameRequest);
     logger.info('GameRequest payload >>>',payload);
     async.waterfall([function(done){
         paymentProcessing.checkPrepaymentRequestStatus(gameRequest.TransId,function(err,result){
             if(err){
-              logger.info(err)
+              logger.info(err);
               return  done(true)
             }
             logger.info("checkPrepaymentRequestStatus result<>" + JSON.stringify(result));
@@ -62,7 +67,7 @@ function processPendingGameRequest(gameRequest){
     },
     function(paymentResult,done){
         logger.info('payment Result befor game request>>',paymentResult);
-        logger.info('Processing makeGameRequest ')
+        logger.info('Processing makeGameRequest ');
         gameRequestProcessing.makeGameRequest(resthandler,payload,function(err,result){
             if(err){
                 logger.info(err);
@@ -93,11 +98,14 @@ function processPendingGameRequest(gameRequest){
             gameRequest.ProcessMessage = result.responseMsg;
             logger.info("Sending sms>>>"+mobile);
             gameRequest.save();
-        } 
-        return  done();
+        }
+        return  done(null,`Completed ${gameRequest.TransId}`);
     }
 
-]) 
+],function(err,result){
+        logger.info('Processing Result >>'+result);
+        completedCallback()
+    })
 }
  
  
@@ -107,4 +115,4 @@ function processPendingGameRequest(gameRequest){
  
 module.exports = {
     processingPendingPayments
-}
+};
