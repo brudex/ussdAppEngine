@@ -121,13 +121,10 @@ models.sequelize.sync().then(function() {
     server.on('error', onError);
     server.on('listening', onListening);
     server.listen(port);
-    require('./designcontrollers/super6design').initializeApp();
+    //require('./uGameDesigns/super6/super6design').initializeApp();
+    require('./uGameDesigns/nla590AndVag/nla590design').initializeApp();
     console.log("listening or port"+port);
 });
-
-
-
-
 
 
 

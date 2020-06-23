@@ -1,4 +1,4 @@
-const TaskFlow = require('./taskflowdesign.controller').TaskFlow;
+const TaskFlow = require('../../designcontrollers/taskflowdesign.controller').TaskFlow;
 
 
 
@@ -20,6 +20,7 @@ getAvailableDraws.actionCode = function (utils,appConfig,_) {
 
 const saveToMemoryDb = taskFlow.newFlowItem('saveToMemDb','javascript');
 saveToMemoryDb.actionCode = function (utils,appConfig,_) {
+    console.log('Running saveToMemDb');
     let drawEvent = this.actionResults.drawEventInfo;
     console.log('The drawEvent'+JSON.stringify(drawEvent));
     let data = {drawNo:0};

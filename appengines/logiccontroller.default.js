@@ -142,9 +142,9 @@ function executePostActionLogic(menu, inRequest, session, callback) {
             if(nextMenu){
                 exeCallback(executionError,menuResponse,nextMenu);
             }else{
-                console.log('Returning menu.runSwitchLogic');
+                console.log('Returning menu.runSwitchLogic >>'+inRequest.input);
                 menu.runSwitchLogic(inRequest,function (nextMenu) {
-                   console.log('runSwitchLogic next menu result >>>'+ JSON.stringify(nextMenu));
+                   console.log('runSwitchLogic next menu result >>>'+ nextMenu);
                    menuResponse = menu.getResponse();
                    exeCallback(executionError,menuResponse,nextMenu);
                 });

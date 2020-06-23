@@ -1,8 +1,8 @@
 {
   "test":{
     "username": "sa",
-    "password": "pass",
-    "database": "NLASuper6",
+    "password": "Pass123@$$123",
+    "database": "UssdDb",
     "host": "localhost",
     "dialect": "mssql",
     "nlaConfig":{

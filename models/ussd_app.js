@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
         appEngine: DataTypes.STRING,
         shortCode: DataTypes.STRING,
         provider: DataTypes.STRING,
-
+        utilsFile : DataTypes.STRING
     }, {
     });
     return UssdApp;

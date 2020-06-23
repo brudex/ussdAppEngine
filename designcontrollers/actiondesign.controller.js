@@ -16,9 +16,9 @@ function deleteAllActions(callback) {
         });
 }
 
-function UssdAction(actionName,menuId,pluginName,actionType){
+function UssdAction(actionName,menuId,pluginName,actionType,appId){
     const self = this;
-    self.appId='super6';
+    self.appId=appId;
     self.menuId=menuId;
     self.actionName=actionName;
     self.inheritsPlugin = pluginName;
@@ -42,8 +42,26 @@ function UssdAction(actionName,menuId,pluginName,actionType){
 
 
 
+function ActionDesignFactory(){
+    const actions=[];
+
+    return {
+        createNew : function (actionName,menuId,pluginName,actionType,appId){
+            const action = new UssdAction(actionName,menuId,pluginName,actionType,appId);
+            actions.push(action);
+            return action;
+        } ,
+        saveAllActions : function () {
+            actions.forEach(function (m) {
+                m.save();
+            })
+        }
+    }
+}
+
 module.exports = {
     creatAction,
     UssdAction,
-    deleteAllActions
+    deleteAllActions,
+    ActionDesignFactory
  };

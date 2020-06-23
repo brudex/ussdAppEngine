@@ -1,10 +1,11 @@
 var async = require('async');
-var utils = require("../utils");var logger = require("../logger");
+var utils = require("../utils");
+var logger = require("../logger");
 var db = require("../models");
 var env = process.env.NODE_ENV || "test";
 const appConfig =  require('../config/config.json')[env];
 const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;//  
-const _GameApiToken = appConfig.nlaConfig.cncp.Token;;
+const _GameApiToken = appConfig.nlaConfig.cncp.Token;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;
 const paymentProcessing = require('./payment.processing');
 const gameConfiguration = require('./game.configurations');
@@ -37,7 +38,7 @@ function processGameRequest(gameRequest, callback) {
             done(null,gameRequest)
         },
         function (gameReq, topdone) {
-            let paymentGameCode =  gameMarks.super6;
+            let paymentGameCode =  paymentProcessing.PaymentGameCode_SUPER6;
                     setTimeout(function(){
                         paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
                             if (err) {
@@ -125,6 +126,7 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
             betType = "DT";
             break;
     }
+    console.log('The gameData is >>> '+JSON.stringify(gameData));
     const stakeNos = gameData.pick5chooseNumber.split(' ');
     const codeStr = stakeNos.join('+');
     const stakeAmount = Number(gameData.amount);

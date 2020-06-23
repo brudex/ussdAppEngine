@@ -29,6 +29,22 @@ function getUssdAppByAppId(appId,callback){
         })
 }
 
+
+function getAllUssdApps(callback){
+    db.UssdApp.findAll({})
+        .then(function (ussdpps) {
+            const apps =[];
+            ussdpps.forEach(function (ussdpp) {
+                let app = new UssdApp(ussdpp);
+                apps.push(app);
+            });
+            if(apps.length){
+                return callback(null,apps)
+            }
+            callback("No apps found");
+        })
+}
+
  function getUssdAppByName(appName){
      db.UssdApp.findOne({where:{appName:appName}})
          .then(function (ussdpp) {
@@ -64,5 +80,6 @@ function UssdApp(data){
 module.exports = {
     getUssdAppByShortCode,
     getUssdAppByName,
-    getUssdAppByAppId
+    getUssdAppByAppId,
+    getAllUssdApps
 };

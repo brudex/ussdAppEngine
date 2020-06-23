@@ -8,8 +8,8 @@ const cron = require('node-cron');
 
 
 //gameProcessing.processingPendingPayments();
-actionPostGameRequest.resetOrderNumberCounter();
-gameConfiguratoin.CheckAvailableDraws();
+// actionPostGameRequest.resetOrderNumberCounter();
+// gameConfiguratoin.CheckAvailableDraws();
 super6Processing.processSuper6Requests();
 //gameReprocessing.reProcessPaidGames();
 

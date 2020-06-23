@@ -12,7 +12,7 @@ const CollaboratorCode = appConfig.nlaConfig.payment.CollaboratorCode;
 
 let PaymentGameCode_super6590 = "011";
 const PaymentGameCode_VAG90 = "017";
-const PaymentGameCode_SUPER6 = "008";
+const PaymentGameCode_SUPER6 = "018";
 
 function makePrepaymentRequest(amount,gameCode,reference,mobile,network,callback) {
     let bankCode = 1;

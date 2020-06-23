@@ -103,10 +103,11 @@ function UssdMenuClass(menu){
                     case 'goto':
                         {
                             nextMenuId = operation.actionParam;
+                            console.log('In goto nextMenu goto >>'+ nextMenuId);
                            return  getMenuByUniqueId(nextMenuId,function (nextMenu) {
-                                return callback(nextMenu)
+                                console.log('The nextMenu goto >>'+JSON.stringify(nextMenu));
+                                return callback(nextMenu);
                             })
-
                         }
                     case 'terminate':
                         {

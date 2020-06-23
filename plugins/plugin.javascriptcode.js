@@ -8,7 +8,7 @@ const menuController = require('../controllers/menu.controller');
 *self.menu.headerText, self.menu.displayText, self the menu.footerText
 *terminate(), goto(menuId)
 */
- function JavascriptCodePlugin(){
+ function JavascriptCodePlugin(utilsFile){
     const self = this;
     self.err = null;
     self.actionResponse=null;

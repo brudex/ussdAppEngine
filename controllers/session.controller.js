@@ -81,6 +81,7 @@ function UssdUserSession(data,ussdApp){
         };
         let input = inRequest.input.trim();
         console.log('Input is  '+input);
+        self[data.inputHolder]=inRequest.input;
         if(utils.isNumeric(input)){
             console.log('Input is numeric '+input);
             if(_.isInteger(Number(input))){
@@ -89,10 +90,9 @@ function UssdUserSession(data,ussdApp){
                     if(result){
                         menuResponse = result.menuResponse;
                         data.selectedOption= extractSelectedOptionText(menuResponse,inRequest.input);
+                        self[data.inputHolder+'Label']=data.selectedOption;
                     }
-                    console.log('Saving user peek result>>'+JSON.stringify(result));
-                    console.log('Saving user input>>'+JSON.stringify(data));
-                     db.UssdUserInput.create(data);
+                    db.UssdUserInput.create(data);
                 });
             }else{
                 db.UssdUserInput.create(data);
@@ -106,9 +106,9 @@ function UssdUserSession(data,ussdApp){
         db.UssdUserInput.findAll({where:{appId:this.appId,sessionUuid:this.sessionUuid}})
             .then(function (inputs) {
                 let obj = {};
-                inputs.forEach(function (item) {
+                 inputs.forEach(function (item) {
                     if(item.selectedOption){
-                        obj[item.inputHolder+'OptionText']=item.input;
+                        obj[item.inputHolder+'Label']=item.selectedOption;
                     }
                     obj[item.inputHolder]=item.input;
                 });

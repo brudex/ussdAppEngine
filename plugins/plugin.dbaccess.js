@@ -1,14 +1,11 @@
-const async = require('async');
 const _ = require('lodash');
 const db = require('../models');
 const logger = require("../logger");
-const menuController = require('../controllers/menu.controller');
-const validationController = require('../controllers/validation.controller');
 
 /**available methods include
  *available fields
  *self.menu.headerText, self.menu.displayText, self the menu.footerText
- *Methods : addHeader(key,value), addBasicAuthentication(userName,password),addJsonHeaders
+ *Methods : self.query, self.tableName, self.queryType
  */
 function DbAccessPlugin(){
     const self = this;

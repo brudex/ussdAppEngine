@@ -1,39 +1,38 @@
 const async = require('async');
 const _ = require('lodash');
-const db = require('../models');
-const logger = require("../logger");
-const appController = require('./app.controller');
-const menudesignController = require('./menudesign.controller');
-const actiondesignController = require('./actiondesign.controller');
-const taskFlowDesignController = require('./taskflowdesign.controller');
+const db = require('../../models');
+const logger = require("../../logger");
+const appController = require('../../designcontrollers/app.controller');
+const menudesignController = require('../../designcontrollers/menudesign.controller');
+const actiondesignController = require('../../designcontrollers/actiondesign.controller');
+const taskFlowDesignController = require('../../designcontrollers/taskflowdesign.controller');
 
-
+const AppId = 'nla590AndVag';
 function createSuper6App(callback){
     const app = {
-        appId: 'super6',
-        appName: 'NLA-SUPER-6',
-        description: 'NLA-SUPER-6',
+        appId: AppId,
+        appName: 'NLA-590_PLUS_VAG',
+        description: 'NLA-590_PLUS_VAG',
         templateTag: 'default',
         appEngine: 'default',
-        shortCode:'*890*6#',
+        shortCode:'*890*8#',
         provider: 'mesika'
     };
     appController.createNewUssdApp(app,function (err, response) {
         if(err){
-             console.log(err);
-             return callback(err);
+            console.log(err);
+            return callback(err);
         }
         logger.info(response);
-        callback()
+        callback();
     })
-
 }
 
 
 
 function initializeApp(){
     async.waterfall([function (done) {
-        appController.findUssdAppByAppId('super6',function (err,app) {
+        appController.findUssdAppByAppId(AppId,function (err,app) {
             if(app){
                return done();
             }
@@ -55,13 +54,13 @@ function initializeApp(){
         actiondesignController.deleteAllActions(done);
     },
     function (done) {
-       require('./super6menudesigns');
-       require('./super6taskflowdesigns');
+       require('./nla590menudesigns');
+       require('./nla590taskflowdesigns');
         done();
     },
         function (done) {
            setTimeout(function () {
-               require('../controllers/crontasks.controller');
+               require('../../controllers/crontasks.controller');
            },5*1000);
              done();
         }

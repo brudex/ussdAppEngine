@@ -20,7 +20,7 @@ router.post('/ussd-provider/:provider',function(req,res){
 
 router.post('/ussd-app/:appId',function(req,res){
     logger.info("AppI  Received >>",req.params.appId);
-     httpController.handleAppRequest(req,res);
+    httpController.handleAppRequest(req,res);
 });
 
 

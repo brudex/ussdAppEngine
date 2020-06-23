@@ -30,9 +30,9 @@ function deleteAllMenus(callback) {
 
 
 
-function Menu(headerText,userDefinedName){
+function Menu(headerText,userDefinedName,appId){
     const self = this;
-    self.appId='super6';
+    self.appId= appId;
     self.uniqueId=  uuidv4();
     self.isFirst =false;
     self.headerText='';
@@ -105,6 +105,11 @@ function Menu(headerText,userDefinedName){
     self.addListItem = function (key,value) {
         listItems.push(`${key} ${value}`);
     };
+    self.addText = function (text) {
+        listItems.push(text);
+    };
+
+
     self.setParent = function (parentMenuId) {
         self.parentMenuId= parentMenuId;
     }
@@ -112,9 +117,30 @@ function Menu(headerText,userDefinedName){
 }
 
 
+function MenuDesignFactory(){
+    const menus=[];
+
+    return {
+        createNew : function (headerText,userDefinedName,appId){
+            const menu = new Menu(headerText,userDefinedName,appId);
+            menus.push(menu);
+            return menu;
+        } ,
+        saveAllMenus : function () {
+            menus.forEach(function (m) {
+                m.save();
+            })
+        }
+
+    }
+
+
+}
+
 
 module.exports = {
     createMenu,
     Menu,
+    MenuDesignFactory,
     deleteAllMenus
  };

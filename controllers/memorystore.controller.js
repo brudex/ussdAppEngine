@@ -42,7 +42,10 @@ function MemoryDb(appId){
     };
     self.getObject = function (key) {
        let row = self.collections['default'].findOne({'key': key});
-       return row.data;
+       if(row){
+           return row.data;
+       }
+       return null;
     };
     self.collections['default'] = memDb.addCollection('default');
 
