@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const models = require("./models");
-const nla_cron_jobs = require("./ussd-actions/cron.jobs");
+const nla_cron_jobs = require("./uGameProcessing/super6/cron.jobs");
 
 
 app.use(function(req, res, next) {

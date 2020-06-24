@@ -1,9 +1,9 @@
 var async = require('async');
-var utils = require("../utils");
-const _restHandler  = require("../utils/resthandler");
-var logger = require("../logger"); 
+var utils = require("../../utils");
+const _restHandler  = require("../../utils/resthandler");
+var logger = require("../../logger");
 var env = process.env.NODE_ENV || "test";
-const appConfig =  require('../config/config.json')[env];
+const appConfig =  require('../../config/config.json')[env];
 const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;//  
 const _GameApiToken = appConfig.nlaConfig.cncp.Token;;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;

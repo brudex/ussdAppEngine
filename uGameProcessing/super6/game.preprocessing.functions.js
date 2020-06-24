@@ -1,9 +1,9 @@
 var async = require('async');
-var utils = require("../utils");
-var logger = require("../logger");
-var db = require("../models");
+var utils = require("../../utils");
+var logger = require("../../logger");
+var db = require("../../models");
 var env = process.env.NODE_ENV || "test";
-const appConfig =  require('../config/config.json')[env];
+const appConfig =  require('../../config/config.json')[env];
 const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;//  
 const _GameApiToken = appConfig.nlaConfig.cncp.Token;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;
@@ -127,7 +127,10 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
             break;
     }
     console.log('The gameData is >>> '+JSON.stringify(gameData));
-    const stakeNos = gameData.pick5chooseNumber.split(' ');
+    let stakeNos =[];
+    if(gameData.pick5chooseNumber){
+          stakeNos = gameData.pick5chooseNumber.split(' ');
+    }
     const codeStr = stakeNos.join('+');
     const stakeAmount = Number(gameData.amount);
     const total_betCount = calculateBetCount(stakeNos, subType, betType, stakeAmount);

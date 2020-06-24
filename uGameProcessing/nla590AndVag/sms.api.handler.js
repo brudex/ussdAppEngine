@@ -9,7 +9,7 @@ function getHeaders(message,mobile,referenceID){
      let config = {
         url : url,
         headers : { Key : '0201aefef8e8403880e66a15ce91a52d' } 
-     };
+     }
     return config;
  }
   
@@ -40,7 +40,11 @@ function sendGameRequestSms(drawEvent,gameData,amount,orderNo,mobile){
     numbersPlayed = numbersPlayed.replace("codeStr","");
     let smsMsg='';
     logger.info("The draw gameMark >>>"+drawEvent.gameMark);
-    smsMsg =`SUPER 6 Official USSD game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
+    if(drawEvent.gameMark==gameConfiguration.DrawEventInfo.nla590.gameMark){
+         smsMsg =`NLA 590 Official USSD Original game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Play more to win more.`;
+    }else{
+         smsMsg =`NLA 590 Official USSD VAG game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
+    }
     smsMsg = utils.removeInvalidIUssdCharacters(smsMsg);
     logger.info('Sending sms >>>'+smsMsg);
     sendSms(smsMsg,mobile);
@@ -58,4 +62,4 @@ function sendGameRequestFailed(gameName,mobile){
 module.exports = {
     sendGameRequestSms: sendGameRequestSms,
     sendGameRequestFailed: sendGameRequestFailed
- };
+ }

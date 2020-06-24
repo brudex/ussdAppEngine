@@ -1,7 +1,7 @@
 "use strict";
-var resthandler = require("../utils/resthandler");
-var logger = require("../logger");
-var db = require("../models");
+var resthandler = require("../../utils/resthandler");
+var logger = require("../../logger");
+var db = require("../../models");
 const async = require('async');
 var gameRequestProcessing = require("./game.preprocessing.functions");
 var gameConfiguration = require("./game.configurations");

@@ -4,7 +4,7 @@ var logger = require("../logger");
 var gameRequestProcessing = require("./game.preprocessing.functions");
 var inputValidations = require("./action.input.validations");
 var gameConfigurations = require("./game.configurations");
-const actionName = "confirmAmount";
+const actionName = "confirmAmountVagLotto";
 
   
 function handleRequest(params,callback){
@@ -29,15 +29,14 @@ function handleRequest(params,callback){
                 mobile:params.sessionData.mobile,
                 network:params.sessionData.network,
                 directOption:params.inputValues.directOption,
-                gameOption: params.inputValues.gameOption,
+                gameOption: "2",
                 numberToPlay : params.inputValues.numberToPlay,
                 betAmount : params.inputValues.betAmount,
-                machineOption: params.inputValues.machineOption,
                 confirmAmount : params.inputValues.confirmAmount,
                 lottoComp : params.inputValues.lottoComp
-             };
+             }
             let amounToPay = calculateTotalAmout(gameData);
-            response.message = `NLA 5 90 Please Confirm Your Resultant Stake Amount is GHS${amounToPay} Enter :\r\n1. Confirm\n\r\n2. Cancel\n`;
+            response.message = `NLA Vag 5 90 Morning Please Confirm Your Resultant Stake Amount is GHS${amounToPay} Enter :\r\n1. Confirm\n\r\n2. Cancel\n`;
             response.responseType = "input"; 
         }       
     }else{
@@ -49,24 +48,23 @@ function handleRequest(params,callback){
 
 function calculateTotalAmout(gameData){
     let computResult = gameRequestProcessing.computeSubTypeBetType(gameData);
-    const stakeNos = computResult.stakeNos;
+    var stakeNos = computResult.stakeNos
     let stakeAmount = Number(computResult.stakeAmount);
     let betType = computResult.betType;
     let subType = computResult.subType;
     console.log(`the calculateTotalAmout  bettype ${betType} subtype ${subType}`);
     console.log(`the calculateTotalAmout stakeNos >>`+JSON.stringify(stakeNos));
     console.log(`the calculateTotalAmout stakeAmount >>`+stakeAmount);
-    const total_betCount = gameRequestProcessing.calculateBetCount(stakeNos, subType, betType, stakeAmount);
+    var total_betCount = gameRequestProcessing.calculateBetCount(stakeNos, subType, betType, stakeAmount);
     console.log(`the calculateTotalAmout totalBetcount >>`+JSON.stringify(total_betCount));
     const totalAmount = (Math.round(total_betCount[0]))/100; 
     return totalAmount.toFixed(2);    
-}
+ }
  
 /*
 /* Do whatever u want in this file but make sure u export and implement the following methods
 */
 module.exports = {
     actionName: actionName,
-    handleRequest: handleRequest,
-    calculateTotalAmout
+    handleRequest: handleRequest
 };
