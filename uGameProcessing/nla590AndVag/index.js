@@ -1,66 +1,73 @@
-/**
- * Created by pakoto on 2/25/16.
- */
 "use strict";
-var fs  = require("fs");
-var path = require("path");
-var controllers      = {};
-var utils = require("../utils");
 var logger = require("../logger");
 var db = require("../models");
-var env       = process.env.NODE_ENV || "test";
-const appConfig = require("../config/config.json")[env];
-
-
-fs.readdirSync(__dirname)
-    .filter(function(file) {
-        var isActionFile = file.indexOf('action.') >= 0;
-        return isActionFile && (file.indexOf(".") !== 0) && (file !== "index.js");
-    })
-    .forEach(function(file) {
-        var controller = require(path.join(__dirname, file));
-        controllers[controller.actionName] = controller.handleRequest;
-        if(controller.actions){
-            console.log('Actions found>>>');
-            Object.keys(controller.actions).forEach(element => {
-                console.log('Action name >>>'+element);
-                controllers[element] = controller.actions[element];
-            });
+var actionPostGameRequest = require("./game.preprocessing.functions");
+var gameProcessing = require("./game.processing");
+var gameReprocessing = require("./game.reprocessing");
+var gameConfiguration = require("./game.configurations");
+const paymentProcessing = require('./payment.processing');
+const process590plusVagRequests = require('./proces590plsVag_request');
+var cron = require('node-cron');
+var __DayOfTheWeek=0;
+  
+ 
+function resetGameTitles(eventInfo,gameType){
+    let  title = "NLA 5/90 Special";
+    if(eventInfo){
+        if (gameType=="nla590"){
+            title=eventInfo.nla590.gameTitle;
+            if(title){         
+               db.UssdMenu.update({displayText:title},{where :{flowId:'0-1',appId:"NLAUssd"}});
+            }
         }
-    });
+        if(gameType=="vagLotto"){
+            title=eventInfo.vagLotto.gameTitle + "\nEnter 1 to continue";
+            if(title){
+               db.UssdMenu.update({displayText:title},{where :{flowId:'0-1',appId:"VagMorning"}});
+            }
+        }
+        paymentProcessing.PaymentGameCode_NLA590 = eventInfo.nla590.paymentCode;
+    } 
+} 
 
-
-function handleUssdTransaction (sessionData,inputValues,actionName, callback){
-    logger.info('Performing Ussd Transaction   >>>', actionName);
-    logger.info('inputValues are  >>>', inputValues);
-    logger.info('Session Data is  >>>', sessionData.dataValues);   
-    var params ={};
-    params.sessionData = sessionData;
-    params.inputValues = inputValues;
-    params.restHandler = utils.restHandler;
-    params.reference = utils.generateTransId();
-    params.db = db;
-    params.logger = logger;
-    params.appConfig = appConfig;
-    logger.info('Calling action >>>'+actionName);
-    if(controllers[actionName]){
-        controllers[actionName](params,function(result){
-            logger.info('Ussd Action Result >>>',result);
-            callback(result);
-        });
-    }else{
-        logger.info('USSD ACTION '+actionName+" NOT FOUND. CONTINUE EXECUTION");
-        console.log('USSD ACTION '+actionName+" NOT FOUND. CONTINUE EXECUTION");
-        var response={};
-        response.message = null;
-        response.responseType = "input"; 
-        return callback(response)
-    }
-   
+function setDayOfTheWeek(){
+    var mydate = new Date();
+    var dayOfWeek =mydate.getDay();
+    var h = mydate.getHours();
+    if(h >= 17){
+        dayOfWeek+=1;
+        if(dayOfWeek>6){
+            dayOfWeek=0;
+        }
+    } 
+    __DayOfTheWeek=dayOfWeek;
+    console.log('The day of the week is >>'+__DayOfTheWeek);
+    logger.info('The day of the week is >>'+__DayOfTheWeek);
+    actionPostGameRequest.setDayOfTheWeek(dayOfWeek);
+    return dayOfWeek;
 }
 
 
 
-module.exports = {
-    handlerRequest: handleUssdTransaction
-};
+gameConfiguration.CheckAvailableDraws(resetGameTitles); 
+actionPostGameRequest.resetOrderNumberCounter();
+gameProcessing.processingPendingPayments();
+gameReprocessing.reProcessPaidGames();
+process590plusVagRequests.processRequests();
+
+ 
+
+cron.schedule('0 */1 * * * *', () => {
+    console.log('Running CheckAvailableDraws>>');
+    gameConfiguration.CheckAvailableDraws(function(drawEventInfo,gameType){
+        console.log('Running resetGameTitles >>');
+    });
+});
+
+cron.schedule('0 0 19 * * *', () => {
+    console.log('Running gameRequestProcessing.resetOrderNumberCounter>>');
+    setDayOfTheWeek();
+    actionPostGameRequest.resetOrderNumberCounter();
+ });
+
+

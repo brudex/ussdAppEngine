@@ -17,7 +17,17 @@ const ProcessStatus = gameConfiguration.ProcessStatus;
 const GameOptions = gameConfiguration.GameOptions;
 
 
-function processGameRequest(gameData, callback) {
+function processGameRequest(gameRequest, callback) {
+    let inputData = JSON.parse(gameRequest.GameData);
+    let gameData = {
+        mobile:params.sessionData.mobile,
+        network:params.sessionData.network,
+        directOption:params.inputValues.directOption,
+        gameOption: "2",
+        numberToPlay : params.inputValues.numberToPlay,
+        betAmount : params.inputValues.betAmount,
+        confirmAmount : params.inputValues.confirmAmount
+    };
     const _Mobile = gameData.mobile;
     const _Network = gameData.network;
     var payload = {};
@@ -35,10 +45,14 @@ function processGameRequest(gameData, callback) {
     async.waterfall([ 
         function(done){
             const betAmount = (Math.round(payload.amount))/100;
-            const data1 = { GameCode: _GameMark,GameData : JSON.stringify(gameData),Mobile:gameData.mobile,Amount:betAmount, GameRequest: JSON.stringify(payload), TransId: _Reference,OrderNumber:_OrderNumber ,RetryCount:0};
-            db.GameRequest.create(data1).then(function (gameReq) {
-                done(null, gameReq);
-            });
+            gameRequest.GameCode =_GameMark;
+            gameRequest.GameRequest = JSON.stringify(payload);
+            gameRequest.TransId =_Reference;
+            gameRequest.Amount = betAmount;
+            gameRequest.OrderNumber =_OrderNumber;
+            gameRequest.RetryCount =0;
+            gameRequest.save();
+            done(null,gameRequest);
         },
         function (gameReq, topdone) {
             let paymentGameCode = "";
@@ -51,7 +65,7 @@ function processGameRequest(gameData, callback) {
             setTimeout(function(){
                 paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
                     if (err) {
-                        return callback("Error processing payment");
+                        return logger.info("Error processing payment");
                     }
                     gameReq.PaymentRequest = JSON.stringify(req);
                     gameReq.PaymentResponse = JSON.stringify(resp);
@@ -76,13 +90,13 @@ function processGameRequest(gameData, callback) {
                     else {
                         gameReq.ProcessStatus = ProcessStatus.Failed;
                         gameReq.save(); 
-                    }
-                   
+                    } 
                 }); 
             },1000*10); 
-            callback(null,"You request is being processed. Check your phone to approve MOMO debit",_Reference);
-            return topdone();
-        } ]);
+             topdone();
+        } ],function(){
+            callback(_Reference);
+        });
 }
 
 function buildVagLottoPayload(gameData,_GameMark,_Reference, _OrderNumber) {
