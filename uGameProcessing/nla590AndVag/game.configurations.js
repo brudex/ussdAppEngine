@@ -1,12 +1,11 @@
 var async = require('async');
-var utils = require("../utils");
-const _restHandler  = require("../utils/resthandler")
-var logger = require("../logger"); 
-var db = require("../models");
+var utils = require("../../utils");
+const _restHandler  = require("../../utils/resthandler")
+var logger = require("../../logger");
 var env = process.env.NODE_ENV || "test";
-const appConfig =  require('../config/config.json')[env];
-const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;//  
-const _GameApiToken = appConfig.nlaConfig.cncp.Token;;
+const appConfig =  require('../../config/config.json')[env];
+const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;
+const _GameApiToken = appConfig.nlaConfig.cncp.Token;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;
 
 const GameOptions = {
@@ -116,15 +115,13 @@ function CheckAvailableDraws(callback) {
                             DrawEventInfo.nla590.gameTitle = getNla590GameTitle(result.gameMark) + " Event No. "+result.drawNo;
                             console.log('The DrawEventInfo nla590>>'+JSON.stringify(DrawEventInfo));
                             logger.info('The DrawEventInfo nla590>>'+JSON.stringify(DrawEventInfo));
-                            if(callback){
-                                callback(DrawEventInfo,"nla590");
-                            }
+                            return done();
                         } else{
                             index+=1;
                             _GameMark = gameMarks.nla590_day[""+index]; 
                             DrawEventInfo.nla590.drawNo =0;
                             if(_GameMark){
-                                recursiveCall(); 
+                              return   recursiveCall();
                             }
                            
                         }
@@ -134,15 +131,16 @@ function CheckAvailableDraws(callback) {
                         _GameMark = gameMarks.nla590_day[""+index]; 
                         DrawEventInfo.nla590.drawNo =0;
                         if(_GameMark){
-                            recursiveCall(); 
+                           return  recursiveCall();
                         }
                            
                     }
-                }  
+                }
+                return done();
             });   
-        }
+        };
         recursiveCall(); 
-        return done();
+
     },
     function(done){
         var _GameMark = gameMarks.vagLotto;
@@ -163,9 +161,7 @@ function CheckAvailableDraws(callback) {
                         DrawEventInfo.vagLotto.gameTitle = VAGLOTTO_TITLE[result.gameMark] + " Event No. "+result.drawNo; 
                         logger.info('The DrawEventInfo vagLotto>>'+JSON.stringify(DrawEventInfo));
                         console.log('The DrawEventInfo vagLotto>>'+JSON.stringify(DrawEventInfo));
-                        if(callback){
-                            callback(DrawEventInfo,"vagLotto");
-                        }
+
                     }else{
                         DrawEventInfo.vagLotto.drawNo =0;
                     }
@@ -175,7 +171,11 @@ function CheckAvailableDraws(callback) {
             } 
           return done();
         });  
-    }])
+    }],function (err) {
+        if(callback){
+            callback(DrawEventInfo);
+        }
+    })
     
 }
    
@@ -187,7 +187,7 @@ function CheckAvailableDraws(callback) {
     let config = {
         url : ServiceUrl,
         headers : { Signature : sig } 
-    }
+    };
     return config;
  }
 

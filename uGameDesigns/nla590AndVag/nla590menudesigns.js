@@ -31,10 +31,10 @@ nla590Page2.setParent(nla590Page1.uniqueId);
 const nla590Page3 = MenuDesignFactory.createNew('NLA 5 90 - Enter bet amount (GHS 1 or more)','betAmount',appId);
 nla590Page3.setParent(nla590Page2.uniqueId);
 
-const nla590Page4 = MenuDesignFactory.createNew('NLA 5 90 - Enter Retailer ID or 1 if not referred by a retailer','numberToPlay',appId);
+const nla590Page4 = MenuDesignFactory.createNew('NLA 5 90 - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
 nla590Page4.setParent(nla590Page3.uniqueId);
 
-const nla590Page5 = MenuDesignFactory.createNew('NLA 5 90 Please confirm your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','pick5',appId);
+const nla590Page5 = MenuDesignFactory.createNew('NLA 5 90 Please confirm your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','confirmAmount',appId);
 nla590Page5.addListItem('1','Confirm');
 nla590Page5.addListItem('2','Cancel');
 nla590Page5.setParent(nla590Page4.uniqueId);
@@ -62,10 +62,10 @@ const vagLottoPage3 = MenuDesignFactory.createNew('VAG 590 Morning.','betAmount'
 vagLottoPage3.addText('Enter bet amount (GHS 1 or more)');
 vagLottoPage3.setParent(vagLottoPage2.uniqueId);
 
-const vagLottoPage4 = MenuDesignFactory.createNew('VAG 590 Morning - Enter Retailer ID or 1 if not referred by a retailer','numberToPlay',appId);
+const vagLottoPage4 = MenuDesignFactory.createNew('VAG 590 Morning - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
 vagLottoPage4.setParent(vagLottoPage3.uniqueId);
 
-const vagLottoPage5 = MenuDesignFactory.createNew('VAG 590 Morning Please confirm. Your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','pick5',appId);
+const vagLottoPage5 = MenuDesignFactory.createNew('VAG 590 Morning Please confirm. Your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','confirmAmount',appId);
 vagLottoPage5.addListItem('1','Confirm');
 vagLottoPage5.addListItem('2','Cancel');
 vagLottoPage5.setParent(vagLottoPage4.uniqueId);

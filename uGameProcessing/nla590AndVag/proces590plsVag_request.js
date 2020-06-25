@@ -1,9 +1,8 @@
 var async = require('async');
- var utils = require("../utils");
-var logger = require("../logger"); 
+ var logger = require("../../logger");
 const gameConfiguration = require('./game.configurations');
 const gameRequestProcessing = require('./game.preprocessing.functions');
-
+var db = require("../../models");
 
 
 
@@ -11,7 +10,8 @@ function processRequests(){
     db.GameRequest.findAll({where:{ProcessStatus :'Queued'}}).then(function (requests) {
         console.log('Found items for processing >>>'+requests.length);
        async.forEach(requests,function (gameRequest,done) {
-            if(gameConfiguration.DrawInProgress(data.gameOption)){
+           let inputData = JSON.parse(gameRequest.GameData);
+            if(gameConfiguration.DrawInProgress(inputData.mainMenu)){
                 gameRequestProcessing.processGameRequest(gameRequest,function (reference) {
                     console.log('processed Request>>>'+reference);
                     done();

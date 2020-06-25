@@ -1,9 +1,9 @@
 "use strict";
-var utils = require("../utils");
-var resthandler = require("../utils/resthandler");
-var logger = require("../logger");
+var utils = require("../../utils");
+var resthandler = require("../../utils/resthandler");
+var logger = require("../../logger");
 var env = process.env.NODE_ENV || "test";
-const appConfig = require('../config/config.json')[env];
+const appConfig = require('../../config/config.json')[env];
 const gameConfiguration = require('./game.configurations');
 const ApiToken = appConfig.nlaConfig.payment.Token;
 const ApiKey = appConfig.nlaConfig.payment.Key;

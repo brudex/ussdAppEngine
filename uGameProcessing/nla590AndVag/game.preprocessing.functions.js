@@ -1,11 +1,9 @@
 var async = require('async');
-const actionName = "postGameRequest";
-var utils = require("../utils");
-const _restHandler  = require("../utils/resthandler")
-var logger = require("../logger"); 
-var db = require("../models");
+ var utils = require("../../utils");
+var logger = require("../../logger");
+var db = require("../../models");
 var env = process.env.NODE_ENV || "test";
-const appConfig =  require('../config/config.json')[env];
+const appConfig =  require('../../config/config.json')[env];
 const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;//  
 const _GameApiToken = appConfig.nlaConfig.cncp.Token;;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;
@@ -18,15 +16,37 @@ const GameOptions = gameConfiguration.GameOptions;
 
 
 function processGameRequest(gameRequest, callback) {
+
+
     let inputData = JSON.parse(gameRequest.GameData);
+   // inputData = ittt= {
+   //     "drawEvent590": "671",
+   //     "drawEventVag": "256",
+   //     "mainMenuLabel": "NLA 590 Event No. 671",
+   //     "mainMenu": "1",
+   //     "numberChooseMessage": "Enter 2 numbers to play\n(Eg. 20 30 )",
+   //     "directMsg": "Direct 2",
+   //     "directOptionLabel": "Direct 2",
+   //     "directOption": "2",
+   //     "numberToPlay": "1",
+   //     "betAmount": "1",
+   //     "amountToPay": "1.00",
+   //     "mobile": "233246584910",
+   //     "network": "MTN"
+   // };
+    let gameOption = inputData.mainMenu;
+    if(['1','2'].indexOf(gameOption) === -1){
+        gameRequest.ProcessStatus = gameConfiguration.ProcessStatus.Failed;
+        return callback (null);
+    }
     let gameData = {
-        mobile:params.sessionData.mobile,
-        network:params.sessionData.network,
-        directOption:params.inputValues.directOption,
-        gameOption: "2",
-        numberToPlay : params.inputValues.numberToPlay,
-        betAmount : params.inputValues.betAmount,
-        confirmAmount : params.inputValues.confirmAmount
+        mobile: inputData.mobile,
+        network: inputData.network,
+        directOption:  inputData.directOption,
+        gameOption: gameOption,
+        numberToPlay : inputData.numberToPlay,
+        betAmount : inputData.amountToPay,
+        confirmAmount :  '1'
     };
     const _Mobile = gameData.mobile;
     const _Network = gameData.network;

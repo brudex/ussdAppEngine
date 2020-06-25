@@ -1,6 +1,6 @@
 "use strict";
-var logger = require("../logger");
-var db = require("../models");
+var logger = require("../../logger");
+var db = require("../../models");
 var actionPostGameRequest = require("./game.preprocessing.functions");
 var gameProcessing = require("./game.processing");
 var gameReprocessing = require("./game.reprocessing");
@@ -49,15 +49,22 @@ function setDayOfTheWeek(){
 
 
 
-gameConfiguration.CheckAvailableDraws(resetGameTitles); 
-actionPostGameRequest.resetOrderNumberCounter();
-gameProcessing.processingPendingPayments();
-gameReprocessing.reProcessPaidGames();
-process590plusVagRequests.processRequests();
+gameConfiguration.CheckAvailableDraws(function (eventInfo) {
+    console.log('Draw event info>>',eventInfo);
+    process590plusVagRequests.processRequests();
+
+});
+
+
+
+// actionPostGameRequest.resetOrderNumberCounter();
+// gameProcessing.processingPendingPayments();
+// gameReprocessing.reProcessPaidGames();
+
 
  
 
-cron.schedule('0 */1 * * * *', () => {
+cron.schedule('0 */5 * * * *', () => {
     console.log('Running CheckAvailableDraws>>');
     gameConfiguration.CheckAvailableDraws(function(drawEventInfo,gameType){
         console.log('Running resetGameTitles >>');
@@ -66,7 +73,6 @@ cron.schedule('0 */1 * * * *', () => {
 
 cron.schedule('0 0 19 * * *', () => {
     console.log('Running gameRequestProcessing.resetOrderNumberCounter>>');
-    setDayOfTheWeek();
     actionPostGameRequest.resetOrderNumberCounter();
  });
 

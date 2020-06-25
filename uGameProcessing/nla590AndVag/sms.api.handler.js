@@ -1,6 +1,6 @@
-var utils = require("../utils");
-var logger = require("../logger");
-var resthandler = require("../utils/resthandler");
+var utils = require("../../utils");
+var logger = require("../../logger");
+var resthandler = require("../../utils/resthandler");
 var gameConfiguration = require("./game.configurations");
   
 function getHeaders(message,mobile,referenceID){   
@@ -9,7 +9,7 @@ function getHeaders(message,mobile,referenceID){
      let config = {
         url : url,
         headers : { Key : '0201aefef8e8403880e66a15ce91a52d' } 
-     }
+     };
     return config;
  }
   
