@@ -43,7 +43,8 @@ function processPendingGameRequest(gameRequest,completedCallback){
                 if (result.transStatus == 0 ) {
                     gameRequest.PaymentStatus = result.transStatus;
                     gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
-                    return done(null,result); 
+                    gameRequest.save();
+                    return done(true);
                 }
                 else if (result.transStatus == 1) {
                     gameRequest.PaymentStatus = result.transStatus;
@@ -62,49 +63,8 @@ function processPendingGameRequest(gameRequest,completedCallback){
                return done(true);
             }
         })
-    },
-    function(paymentResult,done){
-        logger.info('payment Result befor game request>>',paymentResult);
-        logger.info('Processing makeGameRequest ');
-        gameRequestProcessing.makeGameRequest(resthandler,payload,function(err,result){
-            if(err){
-                logger.info(err);
-                return  done(true);
-            }
-            logger.info("makeGameRequest result>>",result);
-            console.log('The game Request >>',gameRequest);
-            let paymentRequest= JSON.parse(gameRequest.PaymentRequest);//gameRequest.getPaymentRequest();
-            let mGameRequest =  JSON.parse(gameRequest.GameRequest); //gameRequest.getGameRequest();
-            return done(null,result,mGameRequest,paymentRequest); 
-        })
-    },
-    function (result,mGameRequest,paymentRequest,done){
-        let mobile;
-        if(paymentRequest){
-              mobile = paymentRequest.client;
-        }else{
-              mobile = gameRequest.Mobile;
-        }
-        gameRequest.GameResponse = JSON.stringify(result);
-        let drawEvent = gameConfiguration.getDrawEvent(gameRequest.GameCode);
-        let gameData = JSON.parse(gameRequest.GameData);
-        if(result && result.responseCode==0){
-            gameRequest.ProcessMessage = result.responseMsg;
-            gameRequest.ProcessStatus = ProcessStatus.Completed;  
-            gameRequest.save();       
-            smsHandler.sendGameRequestSms(drawEvent,gameData,gameRequest.Amount,result.orderNo, mobile); 
-            paymentProcessing.sendGameInfoToNlaOnline(mGameRequest,paymentRequest,resthandler,function(err,saveRequest,saveResult){
-                gameRequest.NlaSaveRequest = JSON.stringify(saveRequest);
-                gameRequest.NlaSaveResponse = JSON.stringify(saveResult);
-                gameRequest.save({fields:['NlaSaveRequest','NlaSaveResponse']});
-            });
-        }else{
-            gameRequest.ProcessMessage = result.responseMsg;
-            logger.info("Sending sms>>>"+mobile);
-            gameRequest.save();
-        } 
-        return  done(null,`Completed ${gameRequest.TransId}`);
     }
+
 
 ],function(err,result){
     logger.info('Processing Result >>'+result);
@@ -119,4 +79,4 @@ function processPendingGameRequest(gameRequest,completedCallback){
  
 module.exports = {
     processingPendingPayments
-}
+};

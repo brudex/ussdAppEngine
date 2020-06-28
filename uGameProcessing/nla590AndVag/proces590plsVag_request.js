@@ -26,7 +26,7 @@ function processRequests(){
        },function(err){
            setTimeout(function () {
             processRequests();
-           },60*1000);
+           },6*1000);
        });
     });
  }
@@ -34,6 +34,6 @@ function processRequests(){
  
  
 module.exports = {
-    processRequests
+    processQueuedRequests : processRequests
       
 };

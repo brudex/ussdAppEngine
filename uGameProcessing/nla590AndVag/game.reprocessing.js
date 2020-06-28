@@ -48,12 +48,13 @@ function processPaidGameRequest(gameRequest,completedCallback){
     let payload = JSON.parse(gameRequest.GameRequest);
     const _Reference = utils.getRandomReference();
     const _OrderNumber = gameRequestProcessing.generateOrderNumber();
-    logger.info('GameRequest payload >>>',JSON.stringify(payload));
-    payload.messengerId = _Reference;
-    payload.orderNo=_OrderNumber;
-    gameRequest.OrderNumber = _OrderNumber;
-    gameRequest.TransId= _Reference;
-    async.waterfall([  
+    logger.info('processPaidGameRequest GameRequest payload >>>',JSON.stringify(payload));
+    if(gameRequest.RetryCount > 1){
+        payload.messengerId = _Reference;
+        payload.orderNo=_OrderNumber;
+        gameRequest.OrderNumber = _OrderNumber;
+    }
+     async.waterfall([
         function(done){
             logger.info('payment Result befor game request>>');
             logger.info('Processing makeGameRequest ');
@@ -78,7 +79,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
             gameRequest.GameResponse = JSON.stringify(result);
             let drawEvent = gameConfiguration.getDrawEvent(gameRequest.GameCode);
             let gameData = JSON.parse(gameRequest.GameData);
-            if(result && result.responseCode==0){
+            if(result && result.responseCode===0){
                 gameRequest.ProcessMessage = result.responseMsg;
                 gameRequest.ProcessStatus = gameRequestProcessing.ProcessStatus.Completed;  
                 gameRequest.save(); 
