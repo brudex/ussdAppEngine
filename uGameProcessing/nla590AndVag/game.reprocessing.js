@@ -48,7 +48,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
     let payload = JSON.parse(gameRequest.GameRequest);
     const _Reference = utils.getRandomReference();
     const _OrderNumber = gameRequestProcessing.generateOrderNumber();
-    logger.info('GameRequest payload >>>',payload);
+    logger.info('GameRequest payload >>>',JSON.stringify(payload));
     payload.messengerId = _Reference;
     payload.orderNo=_OrderNumber;
     gameRequest.OrderNumber = _OrderNumber;
@@ -56,7 +56,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
     async.waterfall([  
         function(done){
             logger.info('payment Result befor game request>>');
-            logger.info('Processing makeGameRequest ')
+            logger.info('Processing makeGameRequest ');
             gameRequestProcessing.makeGameRequest(resthandler,payload,function(err,result){
                 if(err){
                     logger.info(err);
@@ -107,4 +107,4 @@ function processPaidGameRequest(gameRequest,completedCallback){
 module.exports = {
     reProcessGamesWithOrderNumbers,
     reProcessPaidGames
-}
+};

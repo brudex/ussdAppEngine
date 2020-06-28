@@ -34,7 +34,7 @@ function handleRequest(params,callback){
                 betAmount : params.inputValues.betAmount,
                 confirmAmount : params.inputValues.confirmAmount,
                 lottoComp : params.inputValues.lottoComp
-             }
+             };
             let amounToPay = calculateTotalAmout(gameData);
             response.message = `NLA Vag 5 90 Morning Please Confirm Your Resultant Stake Amount is GHS${amounToPay} Enter :\r\n1. Confirm\n\r\n2. Cancel\n`;
             response.responseType = "input"; 
@@ -48,7 +48,7 @@ function handleRequest(params,callback){
 
 function calculateTotalAmout(gameData){
     let computResult = gameRequestProcessing.computeSubTypeBetType(gameData);
-    var stakeNos = computResult.stakeNos
+    var stakeNos = computResult.stakeNos;
     let stakeAmount = Number(computResult.stakeAmount);
     let betType = computResult.betType;
     let subType = computResult.subType;

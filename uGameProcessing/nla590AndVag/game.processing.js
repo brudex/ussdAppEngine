@@ -72,8 +72,9 @@ function processPendingGameRequest(gameRequest,completedCallback){
                 return  done(true);
             }
             logger.info("makeGameRequest result>>",result);
-            let paymentRequest= gameRequest.getPaymentRequest();
-            let mGameRequest = gameRequest.getGameRequest();
+            console.log('The game Request >>',gameRequest);
+            let paymentRequest= JSON.parse(gameRequest.PaymentRequest);//gameRequest.getPaymentRequest();
+            let mGameRequest =  JSON.parse(gameRequest.GameRequest); //gameRequest.getGameRequest();
             return done(null,result,mGameRequest,paymentRequest); 
         })
     },
@@ -95,7 +96,7 @@ function processPendingGameRequest(gameRequest,completedCallback){
             paymentProcessing.sendGameInfoToNlaOnline(mGameRequest,paymentRequest,resthandler,function(err,saveRequest,saveResult){
                 gameRequest.NlaSaveRequest = JSON.stringify(saveRequest);
                 gameRequest.NlaSaveResponse = JSON.stringify(saveResult);
-                gameRequest.save();
+                gameRequest.save({fields:['NlaSaveRequest','NlaSaveResponse']});
             });
         }else{
             gameRequest.ProcessMessage = result.responseMsg;

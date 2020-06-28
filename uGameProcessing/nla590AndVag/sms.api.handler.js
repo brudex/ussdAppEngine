@@ -34,10 +34,9 @@ function sendSms(message,mobile,callback){
 
 function sendGameRequestSms(drawEvent,gameData,amount,orderNo,mobile){
     logger.info('Sending sms message>>>'+mobile);
-    var directOption = gameConfiguration.translateDirectOption(gameData.gameOption, gameData.directOption);
+    var directOption = gameConfiguration.translateDirectOption(gameData.mainMenu, gameData.directOption);
     var numbersPlayed = gameData.numberToPlay;
     var gameTitle = drawEvent.gameTitle;
-    numbersPlayed = numbersPlayed.replace("codeStr","");
     let smsMsg='';
     logger.info("The draw gameMark >>>"+drawEvent.gameMark);
     if(drawEvent.gameMark==gameConfiguration.DrawEventInfo.nla590.gameMark){

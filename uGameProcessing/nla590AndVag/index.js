@@ -54,8 +54,8 @@ gameConfiguration.CheckAvailableDraws(function (eventInfo) {
 
 
 actionPostGameRequest.resetOrderNumberCounter();
-gameProcessing.processingPendingPayments();
-// gameReprocessing.reProcessPaidGames();
+ // gameProcessing.processingPendingPayments();
+gameReprocessing.reProcessPaidGames();
 
 
 cron.schedule('0 */5 * * * *', () => {

@@ -17,18 +17,19 @@ module.exports = function(sequelize, DataTypes) {
     ProcessMessage : DataTypes.STRING,
     OrderNumber: DataTypes.STRING,
     TransId: DataTypes.STRING,
-    RetryCount: DataTypes.INTEGER,
+    RetryCount: DataTypes.INTEGER
   },
   {
-      instanceMethods: {
-        getPaymentRequest : function(){
-          return JSON.parse(this.PaymentRequest);
-        },
-        getGameRequest : function(){
-          return JSON.parse(this.GameRequest);
-        } 
-      }
+
 
   });
+  GameRequest.prototype.getPaymentRequest =function(){
+    return JSON.parse(this.PaymentRequest);
+  };
+
+  GameRequest.prototype.getGameRequest =function(){
+    return JSON.parse(this.GameRequest);
+  };
+
   return GameRequest;
 };

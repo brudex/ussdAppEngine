@@ -16,8 +16,6 @@ const GameOptions = gameConfiguration.GameOptions;
 
 
 function processGameRequest(gameRequest, callback) {
-
-
     let inputData = JSON.parse(gameRequest.GameData);
    // inputData = ittt= {
    //     "drawEvent590": "671",
@@ -76,7 +74,7 @@ function processGameRequest(gameRequest, callback) {
         },
         function (gameReq, topdone) {
             let paymentGameCode = "";
-            if(_GameMark == gameMarks.vagLotto) {
+            if(_GameMark === gameMarks.vagLotto) {
                 paymentGameCode = paymentProcessing.PaymentGameCode_VAG90;
             }
             else {
@@ -91,17 +89,17 @@ function processGameRequest(gameRequest, callback) {
                     gameReq.PaymentResponse = JSON.stringify(resp);
                     logger.info('makePrepaymentRequest result>>>'+JSON.stringify(resp));
                     if (resp && (resp.responseCode === 1 || resp.responseCode === 0 )) {
-                        if (resp.transStatus == 0 ) {
+                        if (resp.transStatus === 0 ) {
                             gameReq.PaymentStatus = resp.transStatus;
                             gameReq.ProcessStatus = ProcessStatus.PendingPayment;
                             gameReq.save();
                         }
-                        else if(resp.transStatus == 1) {
+                        else if(resp.transStatus === 1) {
                             gameReq.PaymentStatus = resp.transStatus;
                             gameReq.ProcessStatus = ProcessStatus.Failed;
                             gameReq.save(); 
                         }
-                        else if(resp.transStatus == 2) {
+                        else if(resp.transStatus === 2) {
                             gameReq.PaymentStatus = resp.transStatus;
                             gameReq.ProcessStatus = ProcessStatus.PendingPayment;
                             gameReq.save(); 
@@ -175,7 +173,7 @@ function buildVagLottoPayload(gameData,_GameMark,_Reference, _OrderNumber) {
     const totalAmount = Math.round(total_betCount[0]);
     const betNumber = total_betCount[1];
     const betTimes = total_betCount[2];
-    payload = {
+    let payload = {
         "messengerId": _Reference,
         "token": "1001",
         "timestamp": utils.timeStamp(),
@@ -247,7 +245,7 @@ function buildNla590Payload(gameData,_GameMark,_Reference, _OrderNumber) {
 
 
 function computeSubTypeBetType(gameData) {
-    var directOption = parseInt(gameData.directOption);
+    const directOption = parseInt(gameData.directOption);
     let subType, betType;
     switch (directOption) {
         case 1:
@@ -301,7 +299,7 @@ function computeSubTypeBetType(gameData) {
         codeStr = "T-" + codeStr;
     } 
     const stakeAmount = Number(gameData.betAmount);
-    return { stakeNos, codeStr, stakeAmount, subType, betType, codeStr };
+    return { stakeNos, codeStr, stakeAmount, subType, betType };
 }
 
  function getErrorResponse(msg){
@@ -343,7 +341,7 @@ function computeSubTypeBetType(gameData) {
     let config = {
         url : ServiceUrl,
         headers : { Signature : sig } 
-    }
+    };
     return config;
  }
  
