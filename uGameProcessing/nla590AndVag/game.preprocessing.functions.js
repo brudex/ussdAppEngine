@@ -91,7 +91,7 @@ function processGameRequest(gameRequest, callback) {
                         }
                     }
                     else {
-                        gameReq.ProcessStatus = ProcessStatus.Failed;
+                        gameReq.ProcessStatus = ProcessStatus.PendingPayment;
                         gameReq.save(); 
                     } 
                 }); 
