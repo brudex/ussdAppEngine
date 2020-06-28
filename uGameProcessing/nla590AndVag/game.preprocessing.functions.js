@@ -17,21 +17,6 @@ const GameOptions = gameConfiguration.GameOptions;
 
 function processGameRequest(gameRequest, callback) {
     let inputData = JSON.parse(gameRequest.GameData);
-   // inputData = ittt= {
-   //     "drawEvent590": "671",
-   //     "drawEventVag": "256",
-   //     "mainMenuLabel": "NLA 590 Event No. 671",
-   //     "mainMenu": "1",
-   //     "numberChooseMessage": "Enter 2 numbers to play\n(Eg. 20 30 )",
-   //     "directMsg": "Direct 2",
-   //     "directOptionLabel": "Direct 2",
-   //     "directOption": "2",
-   //     "numberToPlay": "1",
-   //     "betAmount": "1",
-   //     "amountToPay": "1.00",
-   //     "mobile": "233246584910",
-   //     "network": "MTN"
-   // };
     let gameOption = inputData.mainMenu;
     if(['1','2'].indexOf(gameOption) === -1){
         gameRequest.ProcessStatus = gameConfiguration.ProcessStatus.Failed;
@@ -52,7 +37,7 @@ function processGameRequest(gameRequest, callback) {
     const _Reference = utils.getRandomReference();
     const _OrderNumber = generateOrderNumber();
     var _GameMark ='';
-    let drawEvent = gameConfiguration.getDrawEventByGameOption(gameData.gameOption)
+    let drawEvent = gameConfiguration.getDrawEventByGameOption(gameData.gameOption);
     _GameMark = drawEvent.gameMark;
     if(gameData.gameOption === GameOptions.NLA590) { //NLA 590 
         payload = buildNla590Payload(gameData,_GameMark, _Reference, _OrderNumber); 

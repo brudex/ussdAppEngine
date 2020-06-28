@@ -49,7 +49,7 @@ function setDayOfTheWeek(){
 
 gameConfiguration.CheckAvailableDraws(function (eventInfo) {
     console.log('Draw event info>>',eventInfo);
-    process590plusVagRequests.processRequests();
+    process590plusVagRequests.processQueuedRequests();
 });
 
 
