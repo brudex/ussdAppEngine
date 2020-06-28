@@ -26,7 +26,7 @@ function processRequests(){
        },function(err){
            setTimeout(function () {
             processRequests();
-           },6*1000);
+           },60*1000);
        });
     });
  }
