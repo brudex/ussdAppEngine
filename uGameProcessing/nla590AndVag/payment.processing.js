@@ -52,7 +52,7 @@ function makePrepaymentRequest(amount,gameCode,reference,mobile,network,callback
         "client" :mobile,
         "bankCode" : bankCode ,
         "voucher" :"" 
-    }
+    };
        
     const config = getHeaders(payload,"SaleTicketPrePayment");
     console.log('The payload for prepayment >>',payload);
@@ -101,7 +101,7 @@ function getHeaders(payload,endpoint){
     let config = {
         url : url,
         headers : { Signature : sig } 
-    }
+    };
     return config;
  }
  

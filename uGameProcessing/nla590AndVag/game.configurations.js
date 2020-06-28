@@ -1,19 +1,19 @@
-var async = require('async');
-var utils = require("../../utils");
+const async = require('async');
+const utils = require("../../utils");
 const _restHandler  = require("../../utils/resthandler")
-var logger = require("../../logger");
-var env = process.env.NODE_ENV || "test";
+const logger = require("../../logger");
+const env = process.env.NODE_ENV || "test";
 const appConfig =  require('../../config/config.json')[env];
 const ServiceUrl =  appConfig.nlaConfig.cncp.ServerUrl;
 const _GameApiToken = appConfig.nlaConfig.cncp.Token;
 const _GameApiKey = appConfig.nlaConfig.cncp.Key;
 
 const GameOptions = {
-    NLA590:"1",
-    VAGLOTTO:"2"    
-}
+    NLA590: "1",
+    VAGLOTTO: "2"
+};
 
-var DrawEventInfo = {
+const DrawEventInfo = {
     nla590 : {
        drawNo:0,
        gameMark:"",
@@ -32,14 +32,14 @@ var DrawEventInfo = {
         stopTime :"",
         gameTitle :""
     }  
-} 
+};
 
 const ProcessStatus = {
     PendingPayment : "PendingPayment",
     PaymentSuccess :  "PaymentSuccess",
     Completed : "Completed",
     Failed :  "Failed"
-}
+};
 
 const  NLA590_TITLES = {
     "N90X5_SUN":"NLA 5/90 Monday Special",
@@ -49,7 +49,7 @@ const  NLA590_TITLES = {
     "N90X5_THU":"NLA 5/90 Forturne Thursday",
     "N90X5_FRI":"NLA 5/90 Friday Bonanza",
     "N90X5_SAT":"NLA 5/90 National",
-}
+};
 
 const NLA590_PAYMENTCODES = {
     "N90X5_SUN" :"011",
@@ -59,11 +59,11 @@ const NLA590_PAYMENTCODES = {
     "N90X5_THU" :"014",
     "N90X5_FRI" :"015",
     "N90X5_SAT" :"016",  
-}
+};
 
 const  VAGLOTTO_TITLE = {
     "T90X5": "VAG 590 Morning" 
-}
+};
 
 
 function getNla590GameTitle(gameMark){
@@ -74,7 +74,7 @@ function getNla590GameTitle(gameMark){
     return title;
 }
 
-var MAX_PLAY_AMOUNT=1000;
+const MAX_PLAY_AMOUNT=1000;
 const gameMarks = {
     vagLotto :"T90X5",
     nla590 : "N90X5",
@@ -88,14 +88,13 @@ const gameMarks = {
         "6" :"N90X5_SAT",
     }
      
-}
+};
 
 function CheckAvailableDraws(callback) { 
  
     async.parallel([ function(done){
-        
-        var index=0;
-        var _GameMark = gameMarks.nla590_day[""+index]; 
+        let index=0;
+        let _GameMark = gameMarks.nla590_day[""+index];
         const recursiveCall = function(){
             console.log("Making drawEnquiry for GameMark>>>"+_GameMark);
             makeDrawEnquiry(_GameMark, _restHandler, function (err, result) {
@@ -143,7 +142,7 @@ function CheckAvailableDraws(callback) {
 
     },
     function(done){
-        var _GameMark = gameMarks.vagLotto;
+        const _GameMark = gameMarks.vagLotto;
         makeDrawEnquiry(_GameMark, _restHandler, function (err, result) {
             if (err) {   
                 logger.info('makeDrawEnquiry error>>>'+_GameMark,err) ;        
@@ -210,10 +209,10 @@ function CheckAvailableDraws(callback) {
  function translateDirectOption(gameOption,directOption){
      let response ={};
      var playOption=parseInt(directOption);
-     if(gameOption == GameOptions.NLA590){ //NLA 590        
+     if(gameOption === GameOptions.NLA590){ //NLA 590
         switch(playOption){
             case 1 :
-                  response.message = `Direct1`
+                  response.message = `Direct1`;
                 break;
             case 2 :
                 response.message = `Direct2`;
