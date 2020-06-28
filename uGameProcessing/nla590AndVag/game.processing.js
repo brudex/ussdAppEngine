@@ -38,26 +38,32 @@ function processPendingGameRequest(gameRequest,completedCallback){
             }
             logger.info("checkPrepaymentRequestStatus result>>" + JSON.stringify(result));
             gameRequest.PaymentResponse = JSON.stringify(result);
-            console.log("Result.responseCode >>>",result.responseCode);
-            if(result && result.responseCode == 0){
-                if (result.transStatus == 0 ) {
+             if(result){
+                if(result.responseCode === 0){
+                    if (result.transStatus == 0 ) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                    else if (result.transStatus == 1) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.Failed;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                    else if(result.transStatus == 2) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.PendingPayment;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                }else if(result.responseCode === 10){
                     gameRequest.PaymentStatus = result.transStatus;
-                    gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
+                    gameRequest.ProcessStatus = ProcessStatus.Failed;
                     gameRequest.save();
                     return done(true);
                 }
-                else if (result.transStatus == 1) {
-                    gameRequest.PaymentStatus = result.transStatus;
-                    gameRequest.ProcessStatus = ProcessStatus.Failed;
-                    gameRequest.save(); 
-                    return done(true);
-                }
-                else if(result.transStatus == 2) {
-                    gameRequest.PaymentStatus = result.transStatus;
-                    gameRequest.ProcessStatus = ProcessStatus.PendingPayment;
-                    gameRequest.save(); 
-                    return done(true);
-                } 
             }else{
                 gameRequest.save();
                return done(true);
