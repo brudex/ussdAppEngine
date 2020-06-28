@@ -47,22 +47,16 @@ function setDayOfTheWeek(){
     return dayOfWeek;
 }
 
-
-
 gameConfiguration.CheckAvailableDraws(function (eventInfo) {
     console.log('Draw event info>>',eventInfo);
     process590plusVagRequests.processRequests();
-
 });
 
 
-
-// actionPostGameRequest.resetOrderNumberCounter();
-// gameProcessing.processingPendingPayments();
+actionPostGameRequest.resetOrderNumberCounter();
+gameProcessing.processingPendingPayments();
 // gameReprocessing.reProcessPaidGames();
 
-
- 
 
 cron.schedule('0 */5 * * * *', () => {
     console.log('Running CheckAvailableDraws>>');

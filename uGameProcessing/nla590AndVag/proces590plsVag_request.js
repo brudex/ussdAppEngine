@@ -10,7 +10,7 @@ function processRequests(){
     db.GameRequest.findAll({where:{ProcessStatus :'Queued'}}).then(function (requests) {
         console.log('Found items for processing >>>'+requests.length);
        async.forEach(requests,function (gameRequest,done) {
-           let inputData = JSON.parse(gameRequest.GameData);
+            let inputData = JSON.parse(gameRequest.GameData);
             if(gameConfiguration.DrawInProgress(inputData.mainMenu)){
                 gameRequestProcessing.processGameRequest(gameRequest,function (reference) {
                     console.log('processed Request>>>'+reference);

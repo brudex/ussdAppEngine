@@ -10,7 +10,7 @@ const ApiKey = appConfig.nlaConfig.payment.Key;
 const ServiceUrl = appConfig.nlaConfig.payment.ServerUrl;
 const CollaboratorCode = appConfig.nlaConfig.payment.CollaboratorCode;
 
-let PaymentGameCode_NLA590 = "011"
+let PaymentGameCode_NLA590 = "011";
 const PaymentGameCode_VAG90 = "017";
 const PaymentGameCode_SUPER6 = "008";
 
@@ -139,7 +139,7 @@ function getHeaders(payload,endpoint){
         "amount": gameRequest.betlines[0].lineAmount,
         "betNumbers": betNumbers,
         "extendedInfo": null
-    }
+    };
     payload.betLines =[betLine];
     const config = getHeaders(payload,'SaleTicket');
     logger.info('sending Game to NLA payload>>>',payload);
@@ -171,7 +171,7 @@ module.exports = {
     PaymentGameCode_VAG90,
     PaymentGameCode_SUPER6,
     sendGameInfoToNlaOnline
-}
+};
 
 
 

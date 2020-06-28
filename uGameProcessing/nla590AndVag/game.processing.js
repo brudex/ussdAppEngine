@@ -33,13 +33,13 @@ function processPendingGameRequest(gameRequest,completedCallback){
     async.waterfall([function(done){
         paymentProcessing.checkPrepaymentRequestStatus(gameRequest.TransId,function(err,result){
             if(err){
-              logger.info(err)
+              logger.info(err);
               return  done(true)
             }
             logger.info("checkPrepaymentRequestStatus result>>" + JSON.stringify(result));
             gameRequest.PaymentResponse = JSON.stringify(result);
             console.log("Result.responseCode >>>",result.responseCode);
-            if(result && result.responseCode== 0){ 
+            if(result && result.responseCode == 0){
                 if (result.transStatus == 0 ) {
                     gameRequest.PaymentStatus = result.transStatus;
                     gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
@@ -65,7 +65,7 @@ function processPendingGameRequest(gameRequest,completedCallback){
     },
     function(paymentResult,done){
         logger.info('payment Result befor game request>>',paymentResult);
-        logger.info('Processing makeGameRequest ')
+        logger.info('Processing makeGameRequest ');
         gameRequestProcessing.makeGameRequest(resthandler,payload,function(err,result){
             if(err){
                 logger.info(err);
