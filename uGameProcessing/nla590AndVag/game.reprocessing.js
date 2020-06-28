@@ -37,7 +37,7 @@ function reProcessPaidGames(){
                 reProcessPaidGames();
              }) 
         }) 
-    },60*1000);
+    },20*1000);
 } 
  
 function processPaidGameRequest(gameRequest,completedCallback){
