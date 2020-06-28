@@ -110,7 +110,7 @@ function getHeaders(payload,endpoint){
      if(paymentRequest==null){
          paymentRequest ={};
      }
-    logger.info('Sending game information >>>')
+    logger.info('Sending game information >>>');
     var payload = {};
     payload.token=paymentRequest.token;
     payload.timestamp = gameRequest.timestamp;

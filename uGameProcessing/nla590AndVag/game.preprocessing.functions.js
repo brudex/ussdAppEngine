@@ -65,38 +65,37 @@ function processGameRequest(gameRequest, callback) {
             else {
                 paymentGameCode = paymentProcessing.PaymentGameCode_NLA590;
             }
-            setTimeout(function(){
-                paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
-                    if (err) {
-                        return logger.info("Error processing payment");
-                    }
-                    gameReq.PaymentRequest = JSON.stringify(req);
-                    gameReq.PaymentResponse = JSON.stringify(resp);
-                    logger.info('makePrepaymentRequest result>>>'+JSON.stringify(resp));
-                    if (resp && (resp.responseCode === 1 || resp.responseCode === 0 )) {
-                        if (resp.transStatus === 0 ) {
-                            gameReq.PaymentStatus = resp.transStatus;
-                            gameReq.ProcessStatus = ProcessStatus.PendingPayment;
-                            gameReq.save();
-                        }
-                        else if(resp.transStatus === 1) {
-                            gameReq.PaymentStatus = resp.transStatus;
-                            gameReq.ProcessStatus = ProcessStatus.Failed;
-                            gameReq.save(); 
-                        }
-                        else if(resp.transStatus === 2) {
-                            gameReq.PaymentStatus = resp.transStatus;
-                            gameReq.ProcessStatus = ProcessStatus.PendingPayment;
-                            gameReq.save(); 
-                        }
-                    }
-                    else {
+            paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
+                if (err) {
+                    return logger.info("Error processing payment");
+                }
+                gameReq.PaymentRequest = JSON.stringify(req);
+                gameReq.PaymentResponse = JSON.stringify(resp);
+                logger.info('makePrepaymentRequest result>>>'+JSON.stringify(resp));
+                if (resp && (resp.responseCode === 1 || resp.responseCode === 0 )) {
+                    if (resp.transStatus === 0 ) {
+                        gameReq.PaymentStatus = resp.transStatus;
                         gameReq.ProcessStatus = ProcessStatus.PendingPayment;
-                        gameReq.save(); 
-                    } 
-                }); 
-            },1000*10); 
-             topdone();
+                        gameReq.save();
+                    }
+                    else if(resp.transStatus === 1) {
+                        gameReq.PaymentStatus = resp.transStatus;
+                        gameReq.ProcessStatus = ProcessStatus.Failed;
+                        gameReq.save();
+                    }
+                    else if(resp.transStatus === 2) {
+                        gameReq.PaymentStatus = resp.transStatus;
+                        gameReq.ProcessStatus = ProcessStatus.PendingPayment;
+                        gameReq.save();
+                    }
+                }
+                else {
+                    gameReq.ProcessStatus = ProcessStatus.PendingPayment;
+                    gameReq.save();
+                }
+                topdone();
+            });
+
         } ],function(){
             callback(_Reference);
         });
