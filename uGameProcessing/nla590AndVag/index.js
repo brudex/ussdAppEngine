@@ -54,7 +54,7 @@ gameConfiguration.CheckAvailableDraws(function (eventInfo) {
 
 
 actionPostGameRequest.resetOrderNumberCounter();
- // gameProcessing.processingPendingPayments();
+gameProcessing.processingPendingPayments();
 gameReprocessing.reProcessPaidGames();
 
 
