@@ -3,15 +3,19 @@ const actionPostGameRequest = require("./game.preprocessing.functions");
 const super6Processing = require("./process_super6_request");
 const gameConfiguratoin = require("./game.configurations");
 const gameReprocessing = require("./game.reprocessing");
+const gameProcessing = require("./game.processing");
 const cron = require('node-cron');
 
 
 
-//gameProcessing.processingPendingPayments();
-// actionPostGameRequest.resetOrderNumberCounter();
-// gameConfiguratoin.CheckAvailableDraws();
-super6Processing.processSuper6Requests();
-//gameReprocessing.reProcessPaidGames();
+
+actionPostGameRequest.resetOrderNumberCounter();
+gameConfiguratoin.CheckAvailableDraws(function () {
+    super6Processing.processSuper6Requests();
+});
+
+gameProcessing.processingPendingPayments();
+gameReprocessing.reProcessPaidGames();
 
 
 

@@ -23,13 +23,12 @@ function reProcessPaidGames(){
                     reProcessPaidGames();
                 })
             })
-    },60*1000);
+    },5*1000);
 }
 
 
 
 function processPaidGameRequest(gameRequest,completedCallback){
-
     if(gameRequest.RetryCount==null){
         gameRequest.RetryCount =0;
     }
@@ -38,10 +37,11 @@ function processPaidGameRequest(gameRequest,completedCallback){
     const _Reference = utils.getRandomReference();
     const _OrderNumber = gameRequestProcessing.generateOrderNumber();
     logger.info('GameRequest payload >>>',payload);
-    payload.messengerId = _Reference;
-    payload.orderNo=_OrderNumber;
-    gameRequest.OrderNumber = _OrderNumber;
-    gameRequest.TransId= _Reference;
+    if(gameRequest.RetryCount >1){
+        payload.messengerId = _Reference;
+        payload.orderNo=_OrderNumber;
+        gameRequest.OrderNumber = _OrderNumber;
+     }
     async.waterfall([
         function(done){
             logger.info('payment Result befor game request>>');
