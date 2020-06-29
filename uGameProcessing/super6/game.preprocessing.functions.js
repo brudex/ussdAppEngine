@@ -39,7 +39,7 @@ function processGameRequest(gameRequest, callback) {
         },
         function (gameReq, topdone) {
             let paymentGameCode =  paymentProcessing.PaymentGameCode_SUPER6;
-                    setTimeout(function(){
+
                         paymentProcessing.makePrepaymentRequest(payload.amount, paymentGameCode, _Reference, _Mobile, _Network, function (err, req, resp) {
                             if (err) {
                                 return topdone("Error processing payment");
@@ -70,7 +70,7 @@ function processGameRequest(gameRequest, callback) {
                             }
                             return topdone();
                         }); 
-                    },1000*10);
+
 
 
         } ],function (err) {
@@ -144,7 +144,7 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
         "transType": "31004",
         "orderNo": _OrderNumber,
         "gameMark": _GameMark,
-        "drawNo":gameConfiguration.getDrawEventByGameOption().drawNo,//todo gameConfiguration.DrawEventInfo.super6.drawNo,
+        "drawNo": gameConfiguration.getDrawEventByGameOption().drawNo,//todo gameConfiguration.DrawEventInfo.super6.drawNo,
         "amount": totalAmount,
         "client": _Mobile,
         "channel": 4,

@@ -18,7 +18,7 @@ function processSuper6Requests(){
        },function(err){
            setTimeout(function () {
                processSuper6Requests();
-           },60*1000);
+           },5*1000);
        });
     });
  }

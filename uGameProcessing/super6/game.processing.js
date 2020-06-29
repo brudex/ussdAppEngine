@@ -1,12 +1,10 @@
 "use strict";
-var resthandler = require("../../utils/resthandler");
-var logger = require("../../logger");
-var db = require("../../models");
+const logger = require("../../logger");
+const db = require("../../models");
 const async = require('async');
-var gameRequestProcessing = require("./game.preprocessing.functions");
-var gameConfiguration = require("./game.configurations");
+const gameRequestProcessing = require("./game.preprocessing.functions");
+const gameConfiguration = require("./game.configurations");
 const paymentProcessing = require('./payment.processing');
-const smsHandler = require('./sms.api.handler');
 const ProcessStatus = gameConfiguration.ProcessStatus;
  
 
@@ -39,18 +37,21 @@ function processPendingGameRequest(gameRequest,completedCallback){
             }
             logger.info("checkPrepaymentRequestStatus result<>" + JSON.stringify(result));
             gameRequest.PaymentResponse = JSON.stringify(result);
-            console.log("Result.responseCode >>>",result.responseCode);
-            if(result && result.responseCode== 0){ 
+            console.log("Result.responseCode >>>",result);
+            logger.info("Result Super6 checkPrepaymentRequestStatus >>>",result);
+            if(result && result.responseCode == 0){
                 if (result.transStatus == 0 ) {
                     gameRequest.PaymentStatus = result.transStatus;
                     gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
                     gameRequest.save();
-                    return done(null,result); 
+                    logger.info('Super6 checkPrepaymentRequestStatus success');
+                    return done(true);
                 }
                 else if (result.transStatus == 1) {
                     gameRequest.PaymentStatus = result.transStatus;
                     gameRequest.ProcessStatus = ProcessStatus.Failed;
-                    gameRequest.save(); 
+                    gameRequest.save();
+                    logger.info('Super6 checkPrepaymentRequestStatus failed');
                     return done(true);
                 }
                 else if(result.transStatus == 2) {
@@ -64,42 +65,6 @@ function processPendingGameRequest(gameRequest,completedCallback){
                return done(true);
             }
         })
-    },
-    function(paymentResult,done){
-        logger.info('payment Result befor game request>>',paymentResult);
-        logger.info('Processing makeGameRequest ');
-        gameRequestProcessing.makeGameRequest(resthandler,payload,function(err,result){
-            if(err){
-                logger.info(err);
-                return  done(true);
-            }
-            logger.info("makeGameRequest result>>",result);
-            let paymentRequest= gameRequest.getPaymentRequest();
-            let mGameRequest = gameRequest.getGameRequest();
-            return done(null,result,mGameRequest,paymentRequest); 
-        })
-    },
-    function (result,mGameRequest,paymentRequest,done){
-        let mobile = paymentRequest.client;
-        gameRequest.GameResponse = JSON.stringify(result);
-        let drawEvent = gameConfiguration.getDrawEvent(gameRequest.GameCode);
-        let gameData = JSON.parse(gameRequest.GameData);
-        if(result && result.responseCode==0){
-            gameRequest.ProcessMessage = result.responseMsg;
-            gameRequest.ProcessStatus = gameRequestProcessing.ProcessStatus.Completed;  
-            gameRequest.save();       
-            smsHandler.sendGameRequestSms(drawEvent,gameData,gameRequest.Amount,result.orderNo, mobile); 
-            paymentProcessing.sendGameInfoToNlaOnline(mGameRequest,paymentRequest,resthandler,function(err,saveRequest,saveResult){
-                gameRequest.NlaSaveRequest = JSON.stringify(saveRequest);
-                gameRequest.NlaSaveResponse = JSON.stringify(saveResult);
-                gameRequest.save();
-            });
-        }else{
-            gameRequest.ProcessMessage = result.responseMsg;
-            logger.info("Sending sms>>>"+mobile);
-            gameRequest.save();
-        }
-        return  done(null,`Completed ${gameRequest.TransId}`);
     }
 
 ],function(err,result){

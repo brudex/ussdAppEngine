@@ -9,7 +9,8 @@ var gameConfiguration = require("./game.configurations");
 const paymentProcessing = require('./payment.processing');
 const smsHandler = require('./sms.api.handler');
 const ProcessStatus = gameConfiguration.ProcessStatus;
- 
+
+
 function reProcessGamesWithOrderNumbers(array){
     async.each(array,function(item,done){
         db.GameRequest.findOne({where:{ OrderNumber : item}})
