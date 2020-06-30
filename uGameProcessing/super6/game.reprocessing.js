@@ -76,7 +76,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
                 paymentProcessing.sendGameInfoToNlaOnline(mGameRequest,paymentRequest,resthandler,function(err,saveRequest,saveResult){
                     gameRequest.NlaSaveRequest = JSON.stringify(saveRequest);
                     gameRequest.NlaSaveResponse = JSON.stringify(saveResult);
-                    gameRequest.save();
+                    gameRequest.save({fields:['NlaSaveRequest','NlaSaveResponse']});
                 });
             }else{
                 gameRequest.ProcessMessage = result.responseMsg;

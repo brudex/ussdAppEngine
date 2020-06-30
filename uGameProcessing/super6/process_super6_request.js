@@ -1,6 +1,4 @@
 var async = require('async');
-const actionName = "postVagGameRequest";
-var utils = require("../../utils");
 var db = require("../../models");
 var logger = require("../../logger");
 const gameConfiguration = require('./game.configurations');
