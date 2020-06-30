@@ -20,7 +20,7 @@ var DrawEventInfo = {
        noDrawMessage:"There are no draws at the moment",
        startTime :"",
        stopTime :"",
-       gameTitle :"",
+       gameTitle :"Super 6",
        paymentCode :""
     }
 };

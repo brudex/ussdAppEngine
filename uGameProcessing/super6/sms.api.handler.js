@@ -34,11 +34,11 @@ function sendSms(message,mobile,callback){
 
 function sendGameRequestSms(drawEvent,gameData,amount,orderNo,mobile){
     logger.info('Sending sms message>>>'+mobile);
-    var directOption = gameConfiguration.translateDirectOption(gameData.gameOption, gameData.directOption);
-    var numbersPlayed = gameData.numberToPlay;
+    var directOption = gameData.pick5Label;
+    var numbersPlayed = gameData.pick5chooseNumber;
     var gameTitle = drawEvent.gameTitle;
     numbersPlayed = numbersPlayed.replace("codeStr","");
-    let smsMsg='';
+    let smsMsg;
     logger.info("The draw gameMark >>>"+drawEvent.gameMark);
     smsMsg =`SUPER 6 Official USSD game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
     smsMsg = utils.removeInvalidIUssdCharacters(smsMsg);
