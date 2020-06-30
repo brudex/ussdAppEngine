@@ -39,11 +39,7 @@ function sendGameRequestSms(drawEvent,gameData,amount,orderNo,mobile){
     var gameTitle = drawEvent.gameTitle;
     let smsMsg='';
     logger.info("The draw gameMark >>>"+drawEvent.gameMark);
-    if(drawEvent.gameMark==gameConfiguration.DrawEventInfo.nla590.gameMark){
-         smsMsg =`NLA 590 Official USSD Original game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Play more to win more.`;
-    }else{
-         smsMsg =`NLA 590 Official USSD VAG game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
-    }
+    smsMsg =`NLA 590 Official USSD Super 6 game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
     smsMsg = utils.removeInvalidIUssdCharacters(smsMsg);
     logger.info('Sending sms >>>'+smsMsg);
     sendSms(smsMsg,mobile);

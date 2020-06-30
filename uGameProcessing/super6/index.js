@@ -6,9 +6,6 @@ const gameReprocessing = require("./game.reprocessing");
 const gameProcessing = require("./game.processing");
 const cron = require('node-cron');
 
-
-
-
 actionPostGameRequest.resetOrderNumberCounter();
 gameConfiguratoin.CheckAvailableDraws(function () {
     super6Processing.processSuper6Requests();
@@ -21,7 +18,6 @@ gameReprocessing.reProcessPaidGames();
 
 cron.schedule('0 0 19 * * *', () => {
     console.log('Running gameRequestProcessing.resetOrderNumberCounter>>');
-    //setDayOfTheWeek();
     actionPostGameRequest.resetOrderNumberCounter();
 });
 

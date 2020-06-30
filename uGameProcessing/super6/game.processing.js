@@ -22,7 +22,7 @@ function processingPendingPayments(){
                     processingPendingPayments();
                 })
             })
-    },60*1000);
+    },10*1000);
 }
 
 
@@ -39,30 +39,35 @@ function processPendingGameRequest(gameRequest,completedCallback){
             gameRequest.PaymentResponse = JSON.stringify(result);
             console.log("Result.responseCode >>>",result);
             logger.info("Result Super6 checkPrepaymentRequestStatus >>>",result);
-            if(result && result.responseCode == 0){
-                if (result.transStatus == 0 ) {
-                    gameRequest.PaymentStatus = result.transStatus;
-                    gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
-                    gameRequest.save();
-                    logger.info('Super6 checkPrepaymentRequestStatus success');
-                    return done(true);
-                }
-                else if (result.transStatus == 1) {
+            if(result){
+                if(result.responseCode === 0){
+                    if (result.transStatus === 0 ) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.PaymentSuccess;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                    else if (result.transStatus === 1) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.Failed;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                    else if(result.transStatus === 2) {
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.PendingPayment;
+                        gameRequest.save();
+                        return done(true);
+                    }
+                }else if(result.responseCode === 10){
                     gameRequest.PaymentStatus = result.transStatus;
                     gameRequest.ProcessStatus = ProcessStatus.Failed;
                     gameRequest.save();
-                    logger.info('Super6 checkPrepaymentRequestStatus failed');
                     return done(true);
                 }
-                else if(result.transStatus == 2) {
-                    gameRequest.PaymentStatus = result.transStatus;
-                    gameRequest.ProcessStatus = ProcessStatus.PendingPayment;
-                    gameRequest.save(); 
-                    return done(true);
-                } 
             }else{
                 gameRequest.save();
-               return done(true);
+                return done(true);
             }
         })
     }
