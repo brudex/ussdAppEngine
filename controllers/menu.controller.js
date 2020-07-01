@@ -1,4 +1,3 @@
-const async = require('async');
 const db = require('../models');
 const _ = require('lodash');
 const logicOperators = require('./logic.operators');
@@ -117,7 +116,7 @@ function UssdMenuClass(menu){
                 }
             }
         }
-        //get the child menu and return it
+       //get the child menu and return it
        getMenuByParentId(self.uniqueId,function (nextMenu) {
            return callback(nextMenu)
        });
@@ -148,6 +147,5 @@ function UssdMenuClass(menu){
 module.exports = {
     getFirstMenu,
     getCurrentMenu,
-    getMenuByUniqueId,
-    getMenuByUserDefinedName
+    getMenuByUniqueId
 };

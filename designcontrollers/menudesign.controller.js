@@ -4,6 +4,8 @@ const db = require('../models');
 const logger = require("../logger");
 const uuidv4 = require('uuid/v4');
 const { Op } = require("sequelize");
+const validationTypeFunctions = require('../controllers/validation.controller').validationTypeFunctions;
+const ValidationOperators = Object.keys(validationTypeFunctions);
 
 
 function createMenu(data, callback) {
@@ -27,6 +29,11 @@ function deleteAllMenus(callback) {
         });
 }
 
+function saveInputValidation(data,callback) {
+    db.InputValidation.create(data);
+    if(callback)
+        callback({status: "00", message: "InputValidation created successfully"})
+}
 
 
 
@@ -52,6 +59,7 @@ function Menu(headerText,userDefinedName,appId){
     self.parentMenuId ='';
     let switchOperations =[];
     let listItems =[];
+    let inputValidations = [];
     self.terminate = false;
     self.save = function () {
         if(listItems.length){
@@ -74,7 +82,10 @@ function Menu(headerText,userDefinedName,appId){
         };
 
         createMenu(data,function () {
-            console.log(`Menu ---${self.displayText}--- saved `)
+            console.log(`Menu ---${self.displayText}--- saved `);
+            inputValidations.forEach(function (inputValidation) {
+                inputValidation.save();
+            })
         })
     };
     self.switchOperation = {
@@ -108,10 +119,13 @@ function Menu(headerText,userDefinedName,appId){
     self.addText = function (text) {
         listItems.push(text);
     };
-
-
     self.setParent = function (parentMenuId) {
-        self.parentMenuId= parentMenuId;
+        self.parentMenuId = parentMenuId;
+    };
+    self.validateInput =  function () {
+        const validation =  new InputValidation(self.appId,self.uniqueId);
+        inputValidations.push(validation);
+        return validation.createNew();
     }
 
 }
@@ -119,7 +133,6 @@ function Menu(headerText,userDefinedName,appId){
 
 function MenuDesignFactory(){
     const menus=[];
-
     return {
         createNew : function (headerText,userDefinedName,appId){
             const menu = new Menu(headerText,userDefinedName,appId);
@@ -133,7 +146,37 @@ function MenuDesignFactory(){
         }
 
     }
+}
 
+
+
+function InputValidation(appId,menuId){
+    const self = this;
+    self.description = '';
+    const validationModel ={appId:appId,menuId:menuId};
+    let retModel ={};
+    self.createNew = function(){
+          retModel =  {
+            operation : function(validationType,compareValue){
+                validationModel.validationMethod = validationType;
+                validationModel.validationCode = compareValue;
+                return retModel;
+            },
+            validationFunction :null,
+            errorMessage:  function (errorMsg) {
+                validationModel.errorMessage = errorMsg;
+            }
+        };
+        return retModel;
+    };
+    self.save = function () {
+       validationModel.description =self.description;
+       if(retModel.validationFunction){
+           validationModel.validationCode = retModel.validationFunction.toString();
+           validationModel.validationMethod ='javascript';
+       }
+       saveInputValidation(validationModel);
+    }
 
 }
 
