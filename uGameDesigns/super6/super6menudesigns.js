@@ -1,8 +1,9 @@
 const MenuPage = require('../../designcontrollers/menudesign.controller').Menu;
 const UssdAction = require('../../designcontrollers/actiondesign.controller').UssdAction;
 const Operators = require('../../controllers/operator.contants');
+const ValidationOperation = require('../../controllers/validation.operators');
 
- const appId ='super6';
+const appId ='super6';
 /**************Menu Definitions*********/
 const mainMenu = new MenuPage('Super 6 Event No. {{session.inputs.drawNo}}','mainMenu',appId);
 mainMenu.addListItem('',' Please select and option :');
@@ -17,7 +18,7 @@ mainMenu.isFirst=true;
 
 
 const pick5 = new MenuPage('{{session.inputs.itemPicked}}','pick5',appId);
-pick5.addListItem('','Please select an option');
+pick5.addText('Please select an option');
 pick5.addListItem('1','Random Number');
 pick5.addListItem('2','Choose Your Number');
 pick5.addListItem('0','Back');
@@ -58,6 +59,54 @@ pick5.switchOperation.IfInput(Operators.eq,'1').goto(enterAmount.uniqueId);
 mainMenu.switchOperation.IfInput(Operators.eq,'7').goto(drawResult.uniqueId);
 confirmation.switchOperation.IfInput(Operators.eq,'1').goto(finish.uniqueId);
 
+/****************Validations*****************/
+mainMenu.validateInput().operation(ValidationOperation.valueIn,'1,2,3,4,5,6,7').errorMessage('Please select a valid option');
+let pick5ChooseNumbersValidation = pick5ChooseNumbers.validateInput();
+pick5ChooseNumbersValidation.validationFunction = function(input,session){
+    let mainMenuOption = session.inputs.mainMenu;
+    let result = {valid:true,errorMessage : ''};
+    console.log('The validation input values are >>>'+input);
+    console.log('The validation input mainMenuOption values are >>>'+mainMenuOption);
+   if(input){
+       let arr = input.split(/[,;\s]/);
+       console.log('The validation input after split are >>>',JSON.stringify(arr));
+       let mapArr = {};
+       mapArr['1'] = '6';
+       mapArr['2'] = '5';
+       mapArr['3'] = '4';
+       mapArr['4'] = '3';
+       mapArr['5'] = '2';
+       mapArr['6'] = '1';
+       let inputLen = mapArr[mainMenuOption];
+       console.log('The validation result >>>',JSON.stringify(result));
+       if(arr.length !== Number(inputLen)){
+           result.valid= false;
+           result.errorMessage = `You have to choose ${inputLen} numbers`;
+           console.log('The validation result >>>',JSON.stringify(result));
+           return result;
+       }
+
+       if(arr.length){
+           for(let k=0,len=arr.length;k<len;k++){
+               let n= arr[k];
+               if(!isNaN(n) && isFinite(n)){
+                    if(Number(n)> 55){
+                        result.valid= false;
+                        result.errorMessage = "You can't choose numbers above 55";
+                        console.log('The validation result >>>',JSON.stringify(result));
+                        break;
+                    }
+               }
+           }
+       }
+       console.log('The validation result >>>',JSON.stringify(result));
+
+   }
+    return result;
+};
+
+
+pick5ChooseNumbersValidation.errorMessage('Invalid input. Choose numbers between 1 to 55');
 mainMenu.save();
 pick5.save();
 drawResult.save();
@@ -65,8 +114,6 @@ pick5ChooseNumbers.save();
 enterAmount.save();
 confirmation.save();
 finish.save();
-
-
 
 
 /****************Actions Defintions************/
@@ -103,7 +150,6 @@ mainMenuPreAction.actionCode = function () {
         let drawNo = drawEvent.drawNo;
         this.session.setSessionValue('drawNo',drawNo);
     }
-
 };
 
 const pick5Action = new UssdAction('pick5Action',pick5.uniqueId,'javascript','post',appId);
@@ -137,11 +183,11 @@ pick5Action.actionCode = function () {
                      break;
              }
              for(let i=0;i<numCount;i++){
-                 let n= randomNumber(1,100);
+                 let n= randomNumber(1,55);
                  if(numbersChosen.indexOf(n) === -1){
                      numbersChosen.push(n);
                  }else{
-                      n= randomNumber(1,100);
+                      n= randomNumber(1,55);
                      numbersChosen.push(n);
                  }
              }

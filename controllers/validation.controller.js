@@ -9,7 +9,14 @@ function handleInputValidation(menu, inRequest, session,callback){
         .then(function (inputValidations) {
              async.each(inputValidations, function(validation, done) {
                 const validationFunc =validationTypeFunctions[validation.validationMethod];
-                const isValid = validationFunc(inRequest.input,validation.validationCode,session);
+                let onValidateCallback = function (valid, message) {
+                    if(!valid){
+                        if(message){
+                            validation.errorMessage = message;
+                        }
+                    }
+                };
+                const isValid = validationFunc(inRequest.input,validation.validationCode,session,onValidateCallback);
                 if(isValid){
                     return  done()
                 }
@@ -138,16 +145,26 @@ function handleInputValidation(menu, inRequest, session,callback){
         }
         return false;
     },
-    javascript: function(input,validationCode,session){
-        let validationFunc ;
-        const actionCode = `validationFunc = function(session){${validationCode}}`;
+    javascript: function(input,validationCode,session,onValidateCallback){
+        let validationFunc =null;
+        const actionCode = `validationFunc = ${validationCode}`;
         eval(actionCode);
-        const validationResult =validationFunc(session);
-        return validationResult;
+        if(validationFunc && _.isFunction(validationFunc)){
+            const validationResult = validationFunc(input,session);
+            if(_.isObject(validationResult)){
+                if(!validationResult.valid){
+                    onValidateCallback(validationResult.valid,validationResult.errorMessage);
+                }
+            }
+            return validationResult.valid;
+        }
+        return false;
     }
 };
 
 
 module.exports = {
-    handleInputValidation
+    handleInputValidation,
+    validationTypeFunctions
+
 };
