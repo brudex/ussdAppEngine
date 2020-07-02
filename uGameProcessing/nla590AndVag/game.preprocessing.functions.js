@@ -33,10 +33,10 @@ function processGameRequest(gameRequest, callback) {
     };
     const _Mobile = gameData.mobile;
     const _Network = gameData.network;
-    var payload = {};
+    let payload = {};
     const _Reference = utils.getRandomReference();
     const _OrderNumber = generateOrderNumber();
-    var _GameMark ='';
+    let _GameMark ='';
     let drawEvent = gameConfiguration.getDrawEventByGameOption(gameData.gameOption);
     _GameMark = drawEvent.gameMark;
     if(gameData.gameOption === GameOptions.NLA590) { //NLA 590 

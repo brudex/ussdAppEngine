@@ -86,44 +86,32 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
     var directOption = parseInt(gameData.mainMenu);
     switch (directOption) {
         case 1:
-            subType = "Q1";
+            subType = "T55X6_1";
             betType = "DS";
             break;
         case 2:
-            subType = "RX2";
+            subType = "T55X6_2";
             betType = "DS";
             break;
         case 3:
-            subType = "RX3";
+            subType = "T55X6_3";
             betType = "DS";
             break;
         case 4:
-            subType = "RX4";
+            subType = "T55X6_4";
             betType = "DS";
             break;
         case 5:
-            subType = "RX5";
+            subType = "T55X6_5";
             betType = "DS";
             break;
         case 6:
-            subType = "RX2";
-            betType = "FS";
+            subType = "T55X6_6";
+            betType = "DS";
             break;
-        case 7:
-            subType = "RX3";
-            betType = "FS";
-            break;
-        case 8:
-            subType = "RX4";
-            betType = "FS";
-            break;
-        case 9:
-            subType = "RX5";
-            betType = "FS";
-            break;
-        case 10:
-            subType = "RX2";
-            betType = "DT";
+        default:
+            subType = "T55X6_1";
+            betType = "DS";
             break;
     }
     console.log('The gameData is >>> '+JSON.stringify(gameData));
