@@ -1,6 +1,7 @@
 const MenuDesignFactory = require('../../designcontrollers/menudesign.controller').MenuDesignFactory();
 const ActionDesignFactory = require('../../designcontrollers/actiondesign.controller').ActionDesignFactory();
 const Operators = require('../../controllers/operator.contants');
+const ValidationOperation = require('../../controllers/validation.operators');
 
  const appId ='nla590AndVag';
 /**************NLA Main Menu Definitions*********/
@@ -82,6 +83,91 @@ vagLottoPage5.switchOperation.IfInput(Operators.eq,'1').goto(finish.uniqueId);
 
 nla590Page5.switchOperation.IfInput(Operators.eq,'2').terminate();
 vagLottoPage5.switchOperation.IfInput(Operators.eq,'2').terminate();
+
+
+/*************Input Validations*********************/
+mainMenu.validateInput().operation(ValidationOperation.valueIn,'1,2').errorMessage('Please select a valid option');
+let nla590Page2Validation = nla590Page2.validateInput();
+let vagLottoPage2Validation = vagLottoPage2.validateInput();
+nla590Page2Validation.validationFunction =numbersInputValidationFuntion;
+vagLottoPage2Validation.validationFunction =numbersInputValidationFuntion;
+function numbersInputValidationFuntion(input,session){
+    let directInput = session.inputs.directOption;
+    let result = {valid:true,errorMessage : ''};
+    let numberInput = input;
+    if (numberInput == null) {
+        numberInput = '';
+    }
+    let validationErrors = [];
+    let betNumbers = numberInput.split(/[,;\s]/);
+     let directOption = 0;
+    if (!isNaN(directInput) && isFinite(directInput)) {
+        directOption = parseInt(directInput);
+    } else {
+        validationErrors.push('Invalid input for permutation');
+    }
+    const allNumberic = betNumbers.every((element) => {
+        console.log('The element >>'+element);
+        if (!isNaN(element) && isFinite(element)) {
+            if (Number(element) < 1 || Number(element) > 90) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    });
+    if(!allNumberic){
+         validationErrors.push("Invalid input. Bet numbers must be between 1 and 90")
+    }
+    switch (directOption) {
+        case 1:
+            if (betNumbers.length !== directOption) {
+                validationErrors.push('Direct 1 requires  1 number.')
+            }
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            if (betNumbers.length !== directOption) {
+                validationErrors.push(`Direct ${directOption} requires  ${directOption} numbers.`)
+            }
+            break;
+        case 6:
+            if (betNumbers.length < 3) {
+                validationErrors.push('Perm 2 needs a minimum of 3 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 7:
+            if (betNumbers.length < 4) {
+                validationErrors.push('Perm 3 needs a minimum of 4 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 8:
+            if (betNumbers.length < 5) {
+                validationErrors.push('Perm 4 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 9:
+            if (betNumbers.length < 6) {
+                validationErrors.push('Perm 4 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+    }
+    if(validationErrors.length){
+        result.valid=false;
+        result.errorMessage =validationErrors.join('\n');
+    }
+    return result;
+}
+
+
+
+
+
+
+
+
 
 
 /****************Actions Definitions************/
