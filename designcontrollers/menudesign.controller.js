@@ -63,7 +63,11 @@ function Menu(headerText,userDefinedName,appId){
     self.terminate = false;
     self.save = function () {
         if(listItems.length){
-            self.displayText += '\n'+ listItems.join('\n');
+            if(self.displayText.length >10 ){
+                self.displayText += '\n'+ listItems.join('\n');
+            }else{
+                self.displayText +=  listItems.join('\n');
+            }
         }
         const data = {
             appId : self.appId,

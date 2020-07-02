@@ -1,6 +1,7 @@
 const MenuDesignFactory = require('../../designcontrollers/menudesign.controller').MenuDesignFactory();
 const ActionDesignFactory = require('../../designcontrollers/actiondesign.controller').ActionDesignFactory();
 const Operators = require('../../controllers/operator.contants');
+const ValidationOperation = require('../../controllers/validation.operators');
 
  const appId ='nla590AndVag';
 /**************NLA Main Menu Definitions*********/
@@ -31,13 +32,13 @@ nla590Page2.setParent(nla590Page1.uniqueId);
 const nla590Page3 = MenuDesignFactory.createNew('NLA 5 90 - Enter bet amount (GHS 1 or more)','betAmount',appId);
 nla590Page3.setParent(nla590Page2.uniqueId);
 
-const nla590Page4 = MenuDesignFactory.createNew('NLA 5 90 - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
-nla590Page4.setParent(nla590Page3.uniqueId);
+// const nla590Page4 = MenuDesignFactory.createNew('NLA 5 90 - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
+// nla590Page4.setParent(nla590Page3.uniqueId);
 
-const nla590Page5 = MenuDesignFactory.createNew('NLA 5 90 Please confirm your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','confirmAmount',appId);
+const nla590Page5 = MenuDesignFactory.createNew('NLA 5 90 Please confirm your resultant Stake Amount is GHS{{env.amountToPay}}. Enter :','confirmAmount',appId);
 nla590Page5.addListItem('1','Confirm');
 nla590Page5.addListItem('2','Cancel');
-nla590Page5.setParent(nla590Page4.uniqueId);
+nla590Page5.setParent(nla590Page3.uniqueId);
 
 
 /**************VAG 590 Definitions*********/
@@ -62,13 +63,13 @@ const vagLottoPage3 = MenuDesignFactory.createNew('VAG 590 Morning.','betAmount'
 vagLottoPage3.addText('Enter bet amount (GHS 1 or more)');
 vagLottoPage3.setParent(vagLottoPage2.uniqueId);
 
-const vagLottoPage4 = MenuDesignFactory.createNew('VAG 590 Morning - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
-vagLottoPage4.setParent(vagLottoPage3.uniqueId);
+// const vagLottoPage4 = MenuDesignFactory.createNew('VAG 590 Morning - Enter Retailer ID or 1 if not referred by a retailer','retailerId',appId);
+// vagLottoPage4.setParent(vagLottoPage3.uniqueId);
 
-const vagLottoPage5 = MenuDesignFactory.createNew('VAG 590 Morning Please confirm. Your resultant Stake Amount is GHS{{session.inputs.amountToPay}}. Enter :','confirmAmount',appId);
+const vagLottoPage5 = MenuDesignFactory.createNew('VAG 590 Morning Please confirm. Your resultant Stake Amount is GHS{{env.amountToPay}}. Enter :','confirmAmount',appId);
 vagLottoPage5.addListItem('1','Confirm');
 vagLottoPage5.addListItem('2','Cancel');
-vagLottoPage5.setParent(vagLottoPage4.uniqueId);
+vagLottoPage5.setParent(vagLottoPage3.uniqueId);
 
 const finish = MenuDesignFactory.createNew('Your bet has been successfully placed. Please check your phone to approve transaction','finish',appId);
 finish.terminate = true;
@@ -82,6 +83,91 @@ vagLottoPage5.switchOperation.IfInput(Operators.eq,'1').goto(finish.uniqueId);
 
 nla590Page5.switchOperation.IfInput(Operators.eq,'2').terminate();
 vagLottoPage5.switchOperation.IfInput(Operators.eq,'2').terminate();
+
+
+/*************Input Validations*********************/
+mainMenu.validateInput().operation(ValidationOperation.valueIn,'1,2').errorMessage('Please select a valid option');
+let nla590Page2Validation = nla590Page2.validateInput();
+let vagLottoPage2Validation = vagLottoPage2.validateInput();
+nla590Page2Validation.validationFunction =numbersInputValidationFuntion;
+vagLottoPage2Validation.validationFunction =numbersInputValidationFuntion;
+function numbersInputValidationFuntion(input,session){
+    let directInput = session.inputs.directOption;
+    let result = {valid:true,errorMessage : ''};
+    let numberInput = input;
+    if (numberInput == null) {
+        numberInput = '';
+    }
+    let validationErrors = [];
+    let betNumbers = numberInput.split(/[,;\s]/);
+     let directOption = 0;
+    if (!isNaN(directInput) && isFinite(directInput)) {
+        directOption = parseInt(directInput);
+    } else {
+        validationErrors.push('Invalid input for permutation');
+    }
+    const allNumberic = betNumbers.every((element) => {
+        console.log('The element >>'+element);
+        if (!isNaN(element) && isFinite(element)) {
+            return !(Number(element) < 1 || Number(element) > 90);
+
+        }
+        return false;
+    });
+    if(!allNumberic){
+         validationErrors.push("Invalid input. Bet numbers must be between 1 and 90")
+    }
+    switch (directOption) {
+        case 1:
+            if (betNumbers.length !== directOption) {
+                validationErrors.push('Direct 1 requires  1 number.')
+            }
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            if (betNumbers.length !== directOption) {
+                validationErrors.push(`Direct ${directOption} requires  ${directOption} numbers.`)
+            }
+            break;
+        case 6:
+            if (betNumbers.length < 3) {
+                validationErrors.push('Perm 2 needs a minimum of 3 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 7:
+            if (betNumbers.length < 4) {
+                validationErrors.push('Perm 3 needs a minimum of 4 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 8:
+            if (betNumbers.length < 5) {
+                validationErrors.push('Perm 4 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 9:
+            if (betNumbers.length < 6) {
+                validationErrors.push('Perm 5 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
+            }
+            break;
+        case 10:
+            if (betNumbers.length !== 1) {
+                validationErrors.push('Banker 1 needs 1 number')
+            }
+        default:
+            validationErrors.push('Invalid Permutation option');
+            break;
+    }
+    if(validationErrors.length){
+        result.valid=false;
+        result.errorMessage =validationErrors.join('\n');
+    }
+    return result;
+}
+
+
+
 
 
 /****************Actions Definitions************/
@@ -155,7 +241,7 @@ function getNumberInputMessage(){
 vagLottoPage1Action.actionCode =getNumberInputMessage;
 nla590Page1Action.actionCode =getNumberInputMessage;
 
-const nla590Page4Action = ActionDesignFactory.createNew('confirmAmount',nla590Page4.uniqueId,'javascript','post',appId);
+const nla590Page4Action = ActionDesignFactory.createNew('confirmAmount',nla590Page3.uniqueId,'javascript','post',appId);
 nla590Page4Action.actionCode = function () {
 
     const gameData = {
@@ -164,7 +250,7 @@ nla590Page4Action.actionCode = function () {
         directOption:this.session.inputs['directOption'],
         gameOption: "1",
         numberToPlay : this.session.inputs.numberToPlay,
-        betAmount : this.session.inputs.betAmount,
+        betAmount : this.inRequest.input,
         machineOption: "1",
         confirmAmount : "1",
         lottoComp : "1"
@@ -185,9 +271,10 @@ nla590Page4Action.actionCode = function () {
     totalAmount.toFixed(2);
     let amounToPay = totalAmount.toFixed(2);
     this.session.setSessionValue('amountToPay',amounToPay);
-};
+    this.session.setMenuEnvVariable('amountToPay',amounToPay);
+ };
 
-const vagLottoPage4Action = ActionDesignFactory.createNew('confirmAmount',vagLottoPage4.uniqueId,'javascript','post',appId);
+const vagLottoPage4Action = ActionDesignFactory.createNew('confirmAmount',vagLottoPage3.uniqueId,'javascript','post',appId);
 vagLottoPage4Action.actionCode = function () {
     const gameData = {
         mobile:this.session.mobile,
@@ -195,7 +282,7 @@ vagLottoPage4Action.actionCode = function () {
         directOption:this.session.inputs['directOption'],
         gameOption: "2",
         numberToPlay : this.session.inputs.numberToPlay,
-        betAmount : this.session.inputs.betAmount,
+        betAmount : this.inRequest.input,
         machineOption: "1",
         confirmAmount : "1",
         lottoComp : "1"
@@ -215,7 +302,8 @@ vagLottoPage4Action.actionCode = function () {
     totalAmount.toFixed(2);
     let amounToPay = totalAmount.toFixed(2);
     this.session.setSessionValue('amountToPay',amounToPay);
-};
+    this.session.setMenuEnvVariable('amountToPay',amounToPay);
+ };
 
 
 
