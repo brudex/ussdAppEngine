@@ -364,7 +364,7 @@ function computeSubTypeBetType(gameData) {
         codeStr.length > 1;	//Players can choose 2 numbers or more
         betNumber = codeStr.length;
         betTimes = betAmount/0.01;
-        totalAmout = betAmount * betNumber;
+        totalAmount = betAmount * betNumber;
         betCount = totalAmount/0.01;
     }else if(subType=="RX2" && betType=="DS"){  //Direct 2
         codeStr.length = 2;	//Players can only choose 2 numbers
@@ -381,7 +381,7 @@ function computeSubTypeBetType(gameData) {
         betCount = totalAmount/0.01;
     }else if(subType=="RX2" && betType=="DT"){  //Banker to Banker
         var n = codeStr.length;
-        n = 1;	//Players can choose 1 number
+        //n = 1;	//Players can choose 1 number
         betTimes = betAmount/0.01;
         betNumber = 89;
         totalAmount = betAmount * betNumber;
@@ -394,7 +394,7 @@ function computeSubTypeBetType(gameData) {
         betCount = totalAmount/0.01;
     }else if(subType=="RX3" && betType=="FS"){  //Perm 3
         var n = codeStr.length;
-        n > 3;	//Players can choose 4 numbers or more
+        //n > 3;	//Players can choose 4 numbers or more
         betTimes = betAmount/0.01;
         betNumber = n*(n-1)*(n-2)/(3*2)
         totalAmount = betAmount*betNumber;
@@ -407,7 +407,7 @@ function computeSubTypeBetType(gameData) {
         betCount = totalAmount/0.01;
     }else if(subType=="RX4" && betType=="FS"){  //Perm 4
         var n = codeStr.length;
-        n > 4;	//Players can choose 5 numbers or more
+        //n > 4;	//Players can choose 5 numbers or more
         betTimes = betAmount/0.01;
         betNumber = n*(n-1)*(n-2)*(n-3)/(4*3*2);
         totalAmount = betAmount*betNumber;
@@ -420,7 +420,7 @@ function computeSubTypeBetType(gameData) {
         betCount = totalAmount/0.01;
     }else if(subType=="RX5" && betType=="FS"){  //Perm 5
         var n = codeStr.length;
-        n > 5;	//Players can choose 6 numbers or more
+        //n > 5;	//Players can choose 6 numbers or more
         betTimes = betAmount/0.01;
         betNumber = n*(n-1)*(n-2)*(n-3)*(n-4)/(5*4*3*2);
         totalAmount = betAmount*betNumber;
