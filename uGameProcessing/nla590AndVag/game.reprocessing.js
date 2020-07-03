@@ -54,6 +54,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
         payload.messengerId = _Reference;
         payload.orderNo=_OrderNumber;
         gameRequest.OrderNumber = _OrderNumber;
+        gameRequest.GameRequest = JSON.stringify(payload);
     }
      async.waterfall([
         function(done){

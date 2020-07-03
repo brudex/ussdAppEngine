@@ -41,6 +41,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
         payload.messengerId = _Reference;
         payload.orderNo=_OrderNumber;
         gameRequest.OrderNumber = _OrderNumber;
+        gameRequest.GameRequest = JSON.stringify(payload);
      }
     async.waterfall([
         function(done){
@@ -67,6 +68,7 @@ function processPaidGameRequest(gameRequest,completedCallback){
             gameRequest.GameResponse = JSON.stringify(result);
             let drawEvent = gameConfiguration.getDrawEvent(gameRequest.GameCode);
             let gameData = JSON.parse(gameRequest.GameData);
+            gameRequest.save();
             if(result && result.responseCode===0){
                 gameRequest.ProcessMessage = result.responseMsg;
                 gameRequest.ProcessStatus = gameRequestProcessing.ProcessStatus.Completed;
