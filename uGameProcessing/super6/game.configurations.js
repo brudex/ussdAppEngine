@@ -225,11 +225,8 @@ function CheckAvailableDraws(callback) {
 }
 
  function getDrawEvent(gameMark){
-        if(gameMark.indexOf("N90X5")>-1){
-            return DrawEventInfo.nla590;
-        }else if(gameMark.indexOf("T90X5")>-1){
-            return DrawEventInfo.vagLotto;
-        } 
+     return DrawEventInfo.super6;
+      
  }
  
 module.exports = {

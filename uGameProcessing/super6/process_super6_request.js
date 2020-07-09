@@ -20,12 +20,8 @@ function processSuper6Requests(){
        });
     });
  }
- 
-
   
-
  
 module.exports = {
-    processSuper6Requests
-      
+    processSuper6Requests     
 };
