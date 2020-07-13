@@ -87,6 +87,8 @@ vagLottoPage5.switchOperation.IfInput(Operators.eq,'2').terminate();
 
 /*************Input Validations*********************/
 mainMenu.validateInput().operation(ValidationOperation.valueIn,'1,2').errorMessage('Please select a valid option');
+nla590Page1.validateInput().operation(ValidationOperation.valueIn,'1,2,3,4,5,6,7,8,9,10').errorMessage('Please select a valid option');
+vagLottoPage1.validateInput().operation(ValidationOperation.valueIn,'1,2,3,4,5,6,7,8,9,10').errorMessage('Please select a valid option');
 let nla590Page2Validation = nla590Page2.validateInput();
 let vagLottoPage2Validation = vagLottoPage2.validateInput();
 nla590Page2Validation.validationFunction =numbersInputValidationFuntion;
@@ -99,12 +101,16 @@ function numbersInputValidationFuntion(input,session){
         numberInput = '';
     }
     let validationErrors = [];
+
     let betNumbers = numberInput.split(/[,;\s]/);
-     let directOption = 0;
+    let directOption = 0;
     if (!isNaN(directInput) && isFinite(directInput)) {
         directOption = parseInt(directInput);
     } else {
-        validationErrors.push('Invalid input for permutation');
+        return getErrorResult('Invalid input for permutation');
+    }
+    if(/^[0-9\s]+$/g.test(numberInput)===false){
+        return getErrorResult('Invalid input. Separate numbers with space');
     }
     const allNumberic = betNumbers.every((element) => {
         console.log('The element >>'+element);
@@ -114,8 +120,14 @@ function numbersInputValidationFuntion(input,session){
         }
         return false;
     });
+    function hasDuplicates(array) {
+        return (new Set(array)).size !== array.length;
+    }
     if(!allNumberic){
-         validationErrors.push("Invalid input. Bet numbers must be between 1 and 90")
+         return getErrorResult("Invalid input. Bet numbers must be between 1 and 90");
+    }
+    if(hasDuplicates(betNumbers)){
+        return getErrorResult("Bet numbers cannot be repeated");
     }
     switch (directOption) {
         case 1:
@@ -132,32 +144,38 @@ function numbersInputValidationFuntion(input,session){
             }
             break;
         case 6:
-            if (betNumbers.length < 3) {
+            if (betNumbers.length < 3 && betNumbers.length >16) {
                 validationErrors.push('Perm 2 needs a minimum of 3 numbers for valid bet. A maximum of 16 numbers.')
             }
             break;
         case 7:
-            if (betNumbers.length < 4) {
+            if (betNumbers.length < 4 && betNumbers.length >16) {
                 validationErrors.push('Perm 3 needs a minimum of 4 numbers for valid bet. A maximum of 16 numbers.')
             }
             break;
         case 8:
-            if (betNumbers.length < 5) {
+            if (betNumbers.length < 5 && betNumbers.length >16) {
                 validationErrors.push('Perm 4 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
             }
             break;
         case 9:
-            if (betNumbers.length < 6) {
-                validationErrors.push('Perm 5 needs a minimum of 5 numbers for valid bet. A maximum of 16 numbers.')
+            if (betNumbers.length < 6 && betNumbers.length >16) {
+                validationErrors.push('Perm 5 needs a minimum of 6 numbers for valid bet. A maximum of 16 numbers.')
             }
             break;
         case 10:
-            if (betNumbers.length !== 1) {
+            if (betNumbers.length !== 1 ) {
                 validationErrors.push('Banker 1 needs 1 number')
             }
         default:
             validationErrors.push('Invalid Permutation option');
             break;
+    }
+    function getErrorResult(msg){
+        let res ={};
+        res.valid=false;
+        res.errorMessage =msg;
+        return res
     }
     if(validationErrors.length){
         result.valid=false;
