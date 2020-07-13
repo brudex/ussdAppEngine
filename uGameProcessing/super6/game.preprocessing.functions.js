@@ -132,7 +132,7 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
         "transType": "31004",
         "orderNo": _OrderNumber,
         "gameMark": _GameMark,
-        "drawNo": gameConfiguration.getDrawEventByGameOption().drawNo,//todo gameConfiguration.DrawEventInfo.super6.drawNo,
+        "drawNo": Number(gameData.drawNo),
         "amount": totalAmount,
         "client": _Mobile,
         "channel": 4,
@@ -144,7 +144,7 @@ function buildSuper6Payload(gameData,_GameMark,_Reference, _OrderNumber) {
                 "betType": betType,
                 "codeStr": codeStr,
                 "lineAmount": totalAmount,
-                "betTimes": betTimes,
+                "betTimes": 1,
                 "flag": 1
             }
         ]

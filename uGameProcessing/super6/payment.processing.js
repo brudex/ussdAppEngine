@@ -122,12 +122,7 @@ function getHeaders(payload,endpoint){
     let betNumbers=''; 
     console.log('The Game Mark is >>>'+gameRequest.GameCode);  
     console.log('The config Game Mark is >>>'+gameConfiguration.gameMarks.super6);
-    if(gameRequest.gameMark===gameConfiguration.gameMarks.vagLotto){ //Vag GameCode
-         betNumbers = gameRequest.betlines[0].codeStr.replace("+","-");
-    }else{
-        let codestrArr =gameRequest.betlines[0].codeStr.split("-");
-        betNumbers = codestrArr[1].replace("+","-");
-    }
+    betNumbers =  gameRequest.betlines[0].codeStr.replace("+","-");
     let betLine =  {
         "optionCode": gameRequest.betlines[0].subType + gameRequest.betlines[0].betType,
         "optionName": "Standard Bet",
