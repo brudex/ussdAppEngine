@@ -19,7 +19,7 @@
     "json2csv": "^5.0.0",
     "jsonschema": "^1.2.5",
     "jsonwebtoken": "^7.3.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "lokijs": "^1.5.8",
     "morgan": "~1.5.1",
     "mustache": "^4.0.1",
