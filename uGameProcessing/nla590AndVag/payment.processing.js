@@ -123,6 +123,7 @@ function getHeaders(payload,endpoint){
     payload.transTime =paymentRequest.transTime;
     payload.channel =paymentRequest.channel;
     payload.bankCode = paymentRequest.bankCode;
+	payload.extend = '80300003';
     let betNumbers=''; 
     console.log('The Game Mark is >>>'+gameRequest.GameCode);  
     console.log('The config Game Mark is >>>'+gameConfiguration.gameMarks.vagLotto);  
