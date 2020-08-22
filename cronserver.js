@@ -3,8 +3,7 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const models = require("./models");
-// require("./uGameProcessing/nla590AndVag");
- require("./uGameProcessing/super6");
+require("./uGameProcessing/nlaVag");
 
 
 app.use(function(req, res, next) {

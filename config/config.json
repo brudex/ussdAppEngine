@@ -2,7 +2,7 @@
   "test":{
     "username": "sa",
     "password": "Pass123@$$123",
-    "database": "UssdDb",
+    "database": "NLAVag590Db",
     "host": "localhost",
     "dialect": "mssql",
     "nlaConfig":{

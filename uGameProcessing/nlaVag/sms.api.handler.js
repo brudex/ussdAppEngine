@@ -1,7 +1,8 @@
 var utils = require("../../utils");
 var logger = require("../../logger");
 var resthandler = require("../../utils/resthandler");
-
+var gameConfiguration = require("./game.configurations");
+  
 function getHeaders(message,mobile,referenceID){   
      const endpoint = encodeURI(`${mobile}/${message}/${referenceID}`);  
      let url ='https://tek.azure-api.net/ghtp/nlasms/'+endpoint;
@@ -33,13 +34,12 @@ function sendSms(message,mobile,callback){
 
 function sendGameRequestSms(drawEvent,gameData,amount,orderNo,mobile){
     logger.info('Sending sms message>>>'+mobile);
-    var directOption = gameData.pick5Label;
-    var numbersPlayed = gameData.pick5chooseNumber;
+    var directOption = gameConfiguration.translateDirectOption(gameData.mainMenu, gameData.directOption);
+    var numbersPlayed = gameData.numberToPlay;
     var gameTitle = drawEvent.gameTitle;
-    numbersPlayed = numbersPlayed.replace("codeStr","");
-    let smsMsg;
+    let smsMsg='';
     logger.info("The draw gameMark >>>"+drawEvent.gameMark);
-    smsMsg =`SUPER 6 Official USSD game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
+    smsMsg =`NLA 590 Official USSD Original game ticket: ${orderNo}. Your bet: ${directOption}, ${numbersPlayed} Cost: GHS ${amount} has been entered for ${gameTitle}. Thanks.`;
     smsMsg = utils.removeInvalidIUssdCharacters(smsMsg);
     logger.info('Sending sms >>>'+smsMsg);
     sendSms(smsMsg,mobile);
