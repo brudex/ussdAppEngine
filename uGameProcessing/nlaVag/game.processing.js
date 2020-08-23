@@ -1,12 +1,10 @@
 "use strict";
-var resthandler = require("../../utils/resthandler");
-var logger = require("../../logger");
-var db = require("../../models");
+const logger = require("../../logger");
+const db = require("../../models");
 const async = require('async');
-var gameRequestProcessing = require("./game.preprocessing.functions");
-var gameConfiguration = require("./game.configurations");
+const gameRequestProcessing = require("./game.preprocessing.functions");
+const gameConfiguration = require("./game.configurations");
 const paymentProcessing = require('./payment.processing');
-const smsHandler = require('./sms.api.handler');
 const ProcessStatus = gameConfiguration.ProcessStatus;
 
 
@@ -44,6 +42,12 @@ function processPendingGameRequest(gameRequest,completedCallback){
             }
             logger.info("checkPrepaymentRequestStatus result>>" + JSON.stringify(result));
             gameRequest.PaymentResponse = JSON.stringify(result);
+            let retryCount = gameRequest.RetryCount;
+            if(retryCount==null){
+                retryCount=0;
+            }
+            retryCount +=1;
+            gameRequest.RetryCount=retryCount;
              if(result){
                 if(result.responseCode === 0){
                     if (result.transStatus === 0 ) {
@@ -69,9 +73,19 @@ function processPendingGameRequest(gameRequest,completedCallback){
                     gameRequest.ProcessStatus = ProcessStatus.Failed;
                     gameRequest.save();
                     return done(true);
+                }else{
+                    if(retryCount >= 10){
+                        gameRequest.PaymentStatus = result.transStatus;
+                        gameRequest.ProcessStatus = ProcessStatus.Failed;
+                        gameRequest.save();
+                    }
+                    return done(true);
                 }
             }else{
-                gameRequest.save();
+                 if(retryCount >= 10){
+                     gameRequest.ProcessStatus = ProcessStatus.Failed;
+                     gameRequest.save();
+                 }
                return done(true);
             }
         })

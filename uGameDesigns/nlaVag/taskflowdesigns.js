@@ -1,5 +1,5 @@
 const TaskFlow = require('../../designcontrollers/taskflowdesign.controller').TaskFlow;
-const AppId = 'nla590AndVag';
+const AppId = 'nlavag';
 
 /**************Job to get Available draws*********/
 const taskFlow = new TaskFlow(AppId, 'get590AvailableDraws');

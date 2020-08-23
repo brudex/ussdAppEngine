@@ -1,15 +1,13 @@
 "use strict";
-var resthandler = require("../../utils/resthandler");
-var logger = require("../../logger");
-var db = require("../../models");
+const resthandler = require("../../utils/resthandler");
+const logger = require("../../logger");
+const db = require("../../models");
 const async = require('async');
 const utils = require('../../utils');
-var gameRequestProcessing = require("./game.preprocessing.functions");
-var gameConfiguration = require("./game.configurations");
+const gameRequestProcessing = require("./game.preprocessing.functions");
+const gameConfiguration = require("./game.configurations");
 const paymentProcessing = require('./payment.processing');
 const smsHandler = require('./sms.api.handler');
-const ProcessStatus = gameConfiguration.ProcessStatus;
-
 
 function reProcessGamesWithOrderNumbers(array){
     async.each(array,function(item,done){

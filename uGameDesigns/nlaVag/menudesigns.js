@@ -3,7 +3,7 @@ const ActionDesignFactory = require('../../designcontrollers/actiondesign.contro
 const Operators = require('../../controllers/operator.contants');
 const ValidationOperation = require('../../controllers/validation.operators');
 
- const appId ='nla590AndVag';
+ const appId ='nlavag';
 /**************NLA Main Menu Definitions*********/
 const mainMenu = MenuDesignFactory.createNew('Welcome to NLA official USSD.','mainMenu',appId);
 mainMenu.addText('VAG 590 Morning Event No. {{session.inputs.drawEventVag}}');

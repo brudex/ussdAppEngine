@@ -7,7 +7,7 @@ const menudesignController = require('../../designcontrollers/menudesign.control
 const actiondesignController = require('../../designcontrollers/actiondesign.controller');
 const taskFlowDesignController = require('../../designcontrollers/taskflowdesign.controller');
 
-const AppId = 'nla590AndVag';
+const AppId = 'nlavag';
 function createSuper6App(callback){
     const app = {
         appId: AppId,

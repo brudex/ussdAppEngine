@@ -92,55 +92,7 @@ const gameMarks = {
 
 function CheckAvailableDraws(callback) { 
  
-    async.parallel([ function(done){
-        let index=0;
-        let _GameMark = gameMarks.nla590_day[""+index];
-        const recursiveCall = function(){
-            console.log("Making drawEnquiry for GameMark>>>"+_GameMark);
-            makeDrawEnquiry(_GameMark, _restHandler, function (err, result) {
-                if (err) {   
-                    logger.info('makeDrawEnquiry error>>>'+_GameMark ,err) ;      
-                }
-                logger.info("Result from makeDrawEnquiry>>"+_GameMark, result);
-                if (result) {
-                    logger.info("Result responseCode makeDrawEnquiry>>" +_GameMark + result.responseCode);    
-                    if (result && result.responseCode === 0) {
-                        if (result.drawNo) {
-                            DrawEventInfo.nla590.drawNo = result.drawNo; 
-                            DrawEventInfo.nla590.startTime = result.startTime;
-                            DrawEventInfo.nla590.stopTime = result.stopTime;
-                            DrawEventInfo.nla590.gameMark = result.gameMark;
-                            DrawEventInfo.nla590.paymentCode = NLA590_PAYMENTCODES[result.gameMark];
-                            DrawEventInfo.nla590.gameTitle = getNla590GameTitle(result.gameMark) + " Event No. "+result.drawNo;
-                            console.log('The DrawEventInfo nla590>>'+JSON.stringify(DrawEventInfo));
-                            logger.info('The DrawEventInfo nla590>>'+JSON.stringify(DrawEventInfo));
-                            return done();
-                        } else{
-                            index+=1;
-                            _GameMark = gameMarks.nla590_day[""+index]; 
-                            DrawEventInfo.nla590.drawNo =0;
-                            if(_GameMark){
-                              return   recursiveCall();
-                            }
-                           
-                        }
-                    }else if(result.timestamp){
-                        DrawEventInfo.nla590.drawNo =0; 
-                        index+=1;
-                        _GameMark = gameMarks.nla590_day[""+index]; 
-                        DrawEventInfo.nla590.drawNo =0;
-                        if(_GameMark){
-                           return  recursiveCall();
-                        }
-                           
-                    }
-                }
-                return done();
-            });   
-        };
-        recursiveCall(); 
-
-    },
+    async.parallel([
     function(done){
         const _GameMark = gameMarks.vagLotto;
         makeDrawEnquiry(_GameMark, _restHandler, function (err, result) {
@@ -160,7 +112,6 @@ function CheckAvailableDraws(callback) {
                         DrawEventInfo.vagLotto.gameTitle = VAGLOTTO_TITLE[result.gameMark] + " Event No. "+result.drawNo; 
                         logger.info('The DrawEventInfo vagLotto>>'+JSON.stringify(DrawEventInfo));
                         console.log('The DrawEventInfo vagLotto>>'+JSON.stringify(DrawEventInfo));
-
                     }else{
                         DrawEventInfo.vagLotto.drawNo =0;
                     }
@@ -288,13 +239,8 @@ function CheckAvailableDraws(callback) {
  function DrawInProgress(gameOption){
      var stopTime = "";
      let gameName ="";
-     if(gameOption===GameOptions.NLA590){
-        stopTime = DrawEventInfo.nla590.stopTime;
-        gameName = "NLA590";
-     }else{
-        stopTime = DrawEventInfo.vagLotto.stopTime;
-        gameName = "vagLotto";
-     }
+     stopTime = DrawEventInfo.vagLotto.stopTime;
+     gameName = "vagLotto";
      console.log('The stopTime>>>'+stopTime);
      let currentTime = utils.timeStamp();
      logger.info(`DrawTimes ${gameName} stopTime ${stopTime} currentTime ${currentTime}`)
@@ -308,20 +254,11 @@ function CheckAvailableDraws(callback) {
  }
 
  function getDrawEventByGameOption(gameOption){
-     if(gameOption===GameOptions.NLA590){
-       return DrawEventInfo.nla590;
-    }else if(gameOption===GameOptions.VAGLOTTO){
-        return DrawEventInfo.vagLotto;
-    } 
-    return null; 
+     return DrawEventInfo.vagLotto;
 }
 
  function getDrawEvent(gameMark){
-        if(gameMark.indexOf("N90X5")>-1){
-            return DrawEventInfo.nla590;
-        }else if(gameMark.indexOf("T90X5")>-1){
-            return DrawEventInfo.vagLotto;
-        } 
+     return DrawEventInfo.vagLotto;
  }
  
 module.exports = {
